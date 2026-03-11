@@ -1,13 +1,41 @@
 # Java Refined
 
 [![CI](https://github.com/JunggiKim/java-refined/actions/workflows/ci.yml/badge.svg)](https://github.com/JunggiKim/java-refined/actions/workflows/ci.yml)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Java Refined is a Java 8+ library for refinement types, non-empty collections,
 and small functional control types without runtime dependencies.
 
 It lets you move validation out of scattered `if` checks and into explicit
 types such as `PositiveInt`, `NonBlankString`, and `NonEmptyList`.
+
+This project is open source under the MIT license, so you can use, modify, and
+distribute it in personal or commercial codebases.
+
+## Features
+
+- zero runtime dependencies
+- Java 8 bytecode baseline with Java 8+ APIs
+- refined wrappers with safe `of` and throwing `unsafeOf` constructors
+- fail-fast `Validation` and error-accumulating `Validated`
+- non-empty collection wrappers with defensive snapshots
+- structured `Violation` errors with code/message/metadata
+- rich predicate catalog across numeric/string/collection/boolean/logical domains
+
+## Contents
+
+- Why
+- Installation
+- Basic Usage
+- Error Handling
+- Core Concepts
+- Core API
+- Supported Types
+- Design Rules
+- Compatibility
+- Project Status
+- Contributing and Security
+- License
 
 ## Why
 
@@ -23,9 +51,14 @@ that "already validated" becomes part of the type system at the library level.
 
 ## Installation
 
-`0.1.0` has not been published to Maven Central yet.
-Until the first public release lands, use a local snapshot build or source checkout.
-From a source checkout, run `./gradlew publishToMavenLocal` first and resolve the dependency through the local Maven repository.
+This library is currently distributed via source checkout and local Maven builds only.
+From a source checkout, run `./gradlew publishToMavenLocal` and resolve the dependency through the local Maven repository.
+
+Local install checklist:
+
+1. Run `./gradlew publishToMavenLocal`.
+2. Add `mavenLocal()` to your repositories.
+3. Add the dependency coordinates shown below.
 
 ## Coordinates
 
@@ -38,7 +71,6 @@ io.github.junggikim:java-refined
 ```kotlin
 repositories {
     mavenLocal()
-    mavenCentral()
 }
 
 dependencies {
@@ -51,7 +83,6 @@ dependencies {
 ```groovy
 repositories {
     mavenLocal()
-    mavenCentral()
 }
 
 dependencies {
@@ -71,7 +102,7 @@ dependencies {
 
 Ensure the artifact has been published to the local Maven repository before resolving it from Maven.
 
-## Quick Start
+## Basic Usage
 
 ```java
 import io.github.junggikim.refined.refined.collection.NonEmptyList;
@@ -84,7 +115,40 @@ import java.util.Arrays;
 Validation<Violation, PositiveInt> age = PositiveInt.of(18);
 Validation<Violation, NonBlankString> name = NonBlankString.of("Ada");
 Validation<Violation, NonEmptyList<String>> tags = NonEmptyList.of(Arrays.asList("java", "fp"));
+
+Validation<Violation, String> summary =
+    name.zip(age, (n, a) -> n.value() + " (" + a.value() + ")");
 ```
+
+## Error Handling
+
+```java
+import io.github.junggikim.refined.refined.string.NonBlankString;
+import io.github.junggikim.refined.validation.Validated;
+import io.github.junggikim.refined.validation.Validation;
+import io.github.junggikim.refined.violation.Violation;
+import java.util.Arrays;
+import java.util.List;
+
+Validation<Violation, NonBlankString> bad = NonBlankString.of("   ");
+String message = bad.fold(
+    v -> "invalid: " + v.code() + " - " + v.message(),
+    ok -> "ok: " + ok.value()
+);
+
+Validated<String, Integer> left = Validated.invalid(Arrays.asList("age"));
+Validated<String, Integer> right = Validated.invalid(Arrays.asList("name"));
+List<String> errors = left.zip(right, Integer::sum).getErrors();
+```
+
+## Core Concepts
+
+Refined wrappers expose two constructors:
+
+- `of(value)` returns `Validation<Violation, T>` and never throws.
+- `unsafeOf(value)` throws `RefinementException` on invalid input.
+
+`Validation` is fail-fast and stops at the first error. `Validated` accumulates multiple errors into a non-empty list.
 
 ## Core API
 
@@ -109,16 +173,82 @@ Validation<Violation, NonEmptyList<String>> tags = NonEmptyList.of(Arrays.asList
 - JaCoCo `100%` coverage across instruction, branch, line, complexity, method, and class
 - immutable value types and defensive collection snapshots
 
-## Supported Surface
+## Supported Types
 
-- refined numeric wrappers
-- refined character wrappers
-- refined string wrappers, including parser-backed string types
-- non-empty collection wrappers
-- functional control types: `Option`, `Either`, `Try`, `Ior`, `Validated`
-- composable predicates for numeric, string, character, boolean, collection, and logical composition
+### Refined Wrappers — Numeric
 
-The full type matrix is documented in [docs/type-matrix.md](docs/type-matrix.md).
+- `PositiveInt`, `NegativeInt`, `NonNegativeInt`, `NonPositiveInt`, `NonZeroInt`, `NaturalInt`
+- `PositiveLong`, `NegativeLong`, `NonNegativeLong`, `NonPositiveLong`, `NonZeroLong`, `NaturalLong`
+- `PositiveByte`, `NegativeByte`, `NonNegativeByte`, `NonPositiveByte`, `NonZeroByte`, `NaturalByte`
+- `PositiveShort`, `NegativeShort`, `NonNegativeShort`, `NonPositiveShort`, `NonZeroShort`, `NaturalShort`
+- `PositiveFloat`, `NegativeFloat`, `NonNegativeFloat`, `NonPositiveFloat`, `NonZeroFloat`, `FiniteFloat`, `NonNaNFloat`, `ZeroToOneFloat`
+- `PositiveDouble`, `NegativeDouble`, `NonNegativeDouble`, `NonPositiveDouble`, `NonZeroDouble`, `FiniteDouble`, `NonNaNDouble`, `ZeroToOneDouble`
+- `PositiveBigInteger`, `NegativeBigInteger`, `NonNegativeBigInteger`, `NonPositiveBigInteger`, `NonZeroBigInteger`, `NaturalBigInteger`
+- `PositiveBigDecimal`, `NegativeBigDecimal`, `NonNegativeBigDecimal`, `NonPositiveBigDecimal`, `NonZeroBigDecimal`
+
+### Refined Wrappers — Character
+
+- `DigitChar`, `LetterChar`, `LetterOrDigitChar`, `LowerCaseChar`, `UpperCaseChar`, `WhitespaceChar`, `SpecialChar`
+
+### Refined Wrappers — String
+
+- `NonEmptyString`, `NonBlankString`, `TrimmedString`, `UuidString`, `UriString`
+- `EmailString`, `AsciiString`, `AlphabeticString`, `NumericString`, `AlphanumericString`
+- `SlugString`, `LowerCaseString`, `UpperCaseString`
+- `RegexString`, `UrlString`, `Ipv4String`, `Ipv6String`, `HexString`, `HexColorString`, `XmlString`, `XPathString`
+- `Base64String`, `Base64UrlString`, `UlidString`, `JsonString`, `CidrV4String`, `CidrV6String`, `MacAddressString`, `SemVerString`
+- `CreditCardString`, `IsbnString`, `HostnameString`, `JwtString`
+- `Iso8601DateString`, `Iso8601TimeString`, `Iso8601DateTimeString`, `Iso8601DurationString`, `Iso8601PeriodString`, `TimeZoneIdString`
+- `ValidByteString`, `ValidShortString`, `ValidIntString`, `ValidLongString`
+- `ValidFloatString`, `ValidDoubleString`, `ValidBigIntegerString`, `ValidBigDecimalString`
+
+### Refined Wrappers — Collection
+
+- `NonEmptyList`, `NonEmptySet`, `NonEmptyMap`, `NonEmptyDeque`, `NonEmptyIterable`
+- `NonEmptyQueue`, `NonEmptySortedSet`, `NonEmptySortedMap`, `NonEmptyNavigableSet`, `NonEmptyNavigableMap`
+
+### Control Types
+
+- `Option`
+- `Either`
+- `Try`
+- `Ior`
+- `Validated`
+
+### Predicates — Numeric
+
+- `GreaterThan`, `GreaterOrEqual`, `LessThan`, `LessOrEqual`, `EqualTo`, `NotEqualTo`
+- `OpenInterval`, `ClosedInterval`, `OpenClosedInterval`, `ClosedOpenInterval`
+- `EvenInt`, `OddInt`, `EvenLong`, `OddLong`, `EvenBigInteger`, `OddBigInteger`
+- `DivisibleByInt`, `DivisibleByLong`, `DivisibleByBigInteger`
+- `ModuloInt`, `ModuloLong`, `NonDivisibleByInt`, `NonDivisibleByLong`, `NonDivisibleByBigInteger`
+- `FiniteFloatPredicate`, `FiniteDoublePredicate`, `NonNaNFloatPredicate`, `NonNaNDoublePredicate`
+
+### Predicates — String
+
+- `NotEmpty`, `NotBlank`, `LengthAtLeast`, `LengthAtMost`, `LengthBetween`
+- `MatchesRegex`, `StartsWith`, `EndsWith`, `Contains`
+
+### Predicates — Boolean
+
+- `TrueValue`, `FalseValue`, `And`, `Or`, `Xor`, `Nand`, `Nor`, `OneOf`
+
+### Predicates — Character
+
+- `IsDigitChar`, `IsLetterChar`, `IsLetterOrDigitChar`, `IsLowerCaseChar`, `IsUpperCaseChar`, `IsWhitespaceChar`, `IsSpecialChar`
+
+### Predicates — Collection
+
+- `MinSize`, `MaxSize`, `SizeBetween`, `SizeEqual`
+- `ContainsElement`, `EmptyCollection`, `ForAllElements`, `ExistsElement`
+- `HeadSatisfies`, `LastSatisfies`, `IndexSatisfies`, `InitSatisfies`, `TailSatisfies`, `CountMatches`
+- `AscendingList`, `DescendingList`
+
+### Predicates — Logical
+
+- `AllOf`, `AnyOf`, `Not`
+
+The full matrix is kept in [docs/type-matrix.md](docs/type-matrix.md).
 
 ## Compatibility
 
@@ -128,7 +258,6 @@ The full type matrix is documented in [docs/type-matrix.md](docs/type-matrix.md)
   - `./gradlew clean check`
   - `./gradlew testJava8`
   - `./gradlew javadoc generatePomFileForMavenJavaPublication publishToMavenLocal`
-  - `./gradlew prepareRelease`
 - Java 8 runtime compatibility is verified by the `testJava8` toolchain task
 - current build uses Java 8 source/target compatibility and Gradle `--release 8` when running on JDK 9+
 
@@ -137,7 +266,7 @@ See [docs/compatibility.md](docs/compatibility.md) for Java version caveats.
 ## Project Status
 
 - current local version line: `0.1.0-SNAPSHOT`
-- Maven Central publication is not live yet
+- distribution: source checkout and local Maven only
 - API may still evolve before `1.0.0`
 - release notes live in [CHANGELOG.md](CHANGELOG.md)
 
@@ -146,9 +275,7 @@ See [docs/compatibility.md](docs/compatibility.md) for Java version caveats.
 - contribution guide: [CONTRIBUTING.md](CONTRIBUTING.md)
 - code of conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 - security policy: [SECURITY.md](SECURITY.md)
-- release workflow: [docs/release-process.md](docs/release-process.md)
-- repository checklist: [docs/repository-checklist.md](docs/repository-checklist.md)
 
 ## License
 
-Apache-2.0. See [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).

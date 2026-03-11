@@ -7,17 +7,14 @@ import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.external.javadoc.StandardJavadocDocletOptions
 import org.gradle.jvm.tasks.Jar
 import org.gradle.jvm.toolchain.JavaLanguageVersion
-import org.gradle.plugins.signing.Sign
 
 plugins {
     `java-library`
     `maven-publish`
-    signing
     jacoco
     checkstyle
     pmd
     id("com.github.spotbugs") version "6.4.8"
-    id("org.jreleaser") version "1.22.0"
 }
 
 val groupId = property("group") as String
@@ -26,7 +23,6 @@ val junitVersion = property("junitVersion") as String
 val projectUrl = "https://github.com/JunggiKim/java-refined"
 val developerId = "junggikim"
 val developerName = "Junggi Kim"
-val isSnapshot = libraryVersion.endsWith("-SNAPSHOT")
 
 group = groupId
 version = libraryVersion
@@ -86,12 +82,6 @@ tasks.withType<Javadoc>().configureEach {
         javadocOptions.addBooleanOption("html5", true)
     }
     title = "Java Refined ${project.version} API"
-}
-
-tasks.withType<Sign>().configureEach {
-    onlyIf {
-        !isSnapshot && providers.environmentVariable("JRELEASER_GPG_SECRET_KEY").isPresent
-    }
 }
 
 jacoco {
@@ -179,48 +169,6 @@ tasks.named("check") {
     )
 }
 
-val prepareReleaseTasks = listOf(
-    "check",
-    "testJava8",
-    "jacocoTestReport",
-    "javadoc",
-    "sourcesJar",
-    "javadocJar",
-    "generatePomFileForMavenJavaPublication",
-    "publishToMavenLocal",
-    "publish"
-)
-
-val prepareReleasePipeline = tasks.register("prepareReleasePipeline") {
-    dependsOn(prepareReleaseTasks)
-}
-
-tasks.register("prepareRelease") {
-    group = "release"
-    description = "Runs the full local verification pipeline for an OSS release without remote credentials."
-    dependsOn("clean")
-    finalizedBy(prepareReleasePipeline)
-}
-
-tasks.register("verifyJreleaserConfig") {
-    group = "release"
-    description = "Validates JReleaser configuration when release credentials are available."
-    dependsOn("jreleaserConfig")
-    onlyIf {
-        providers.environmentVariable("JRELEASER_GITHUB_TOKEN").isPresent
-    }
-}
-
-tasks.named("jreleaserConfig") {
-    onlyIf {
-        providers.environmentVariable("JRELEASER_GITHUB_TOKEN").isPresent
-    }
-}
-
-jreleaser {
-    gitRootSearch.set(true)
-}
-
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
@@ -234,8 +182,8 @@ publishing {
                 inceptionYear.set("2026")
                 licenses {
                     license {
-                        name.set("Apache License, Version 2.0")
-                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                        name.set("MIT License")
+                        url.set("https://opensource.org/licenses/MIT")
                     }
                 }
                 developers {
@@ -257,24 +205,6 @@ publishing {
             }
         }
     }
-    repositories {
-        maven {
-            name = "staging"
-            url = uri(layout.buildDirectory.dir("staging-deploy"))
-        }
-    }
-}
-
-signing {
-    val signingKey = providers.environmentVariable("JRELEASER_GPG_SECRET_KEY")
-    val signingPassphrase = providers.environmentVariable("JRELEASER_GPG_PASSPHRASE")
-
-    isRequired = !isSnapshot && signingKey.isPresent
-    if (signingKey.isPresent) {
-        useInMemoryPgpKeys(signingKey.get(), signingPassphrase.orNull)
-    }
-
-    sign(publishing.publications["mavenJava"])
 }
 
 tasks.named<Jar>("jar") {
