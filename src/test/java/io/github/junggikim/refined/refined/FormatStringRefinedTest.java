@@ -10,19 +10,25 @@ import io.github.junggikim.refined.core.RefinementException;
 import io.github.junggikim.refined.refined.character.SpecialChar;
 import io.github.junggikim.refined.refined.numeric.ZeroToOneDouble;
 import io.github.junggikim.refined.refined.numeric.ZeroToOneFloat;
+import io.github.junggikim.refined.refined.string.Base64UrlString;
 import io.github.junggikim.refined.refined.string.Base64String;
 import io.github.junggikim.refined.refined.string.CidrV4String;
 import io.github.junggikim.refined.refined.string.CidrV6String;
 import io.github.junggikim.refined.refined.string.CreditCardString;
+import io.github.junggikim.refined.refined.string.HexColorString;
 import io.github.junggikim.refined.refined.string.HostnameString;
 import io.github.junggikim.refined.refined.string.IsbnString;
 import io.github.junggikim.refined.refined.string.Iso8601DateString;
 import io.github.junggikim.refined.refined.string.Iso8601DateTimeString;
+import io.github.junggikim.refined.refined.string.Iso8601DurationString;
+import io.github.junggikim.refined.refined.string.Iso8601PeriodString;
 import io.github.junggikim.refined.refined.string.Iso8601TimeString;
 import io.github.junggikim.refined.refined.string.JsonString;
 import io.github.junggikim.refined.refined.string.JwtString;
 import io.github.junggikim.refined.refined.string.MacAddressString;
 import io.github.junggikim.refined.refined.string.SemVerString;
+import io.github.junggikim.refined.refined.string.TimeZoneIdString;
+import io.github.junggikim.refined.refined.string.UlidString;
 import io.github.junggikim.refined.support.RefinedCase;
 import java.util.List;
 import java.util.stream.Stream;
@@ -34,6 +40,8 @@ class FormatStringRefinedTest {
 
     private static final List<RefinedCase<String>> FORMAT_CASES = listOf(
         new RefinedCase<String>("Base64String", "base64-string", Base64String::of, Base64String::unsafeOf, "SGVsbG8=", "Not!Valid@#"),
+        new RefinedCase<String>("Base64UrlString", "base64-url-string", Base64UrlString::of, Base64UrlString::unsafeOf, "____", "a+b"),
+        new RefinedCase<String>("UlidString", "ulid-string", UlidString::of, UlidString::unsafeOf, "01ARZ3NDEKTSV4RRFFQ69G5FAV", "01ARZ3NDEKTSV4RRFFQ69G5FAI"),
         new RefinedCase<String>("JsonString", "json-string", JsonString::of, JsonString::unsafeOf, "{\"key\":\"value\"}", "{invalid"),
         new RefinedCase<String>("CidrV4String", "cidr-v4-string", CidrV4String::of, CidrV4String::unsafeOf, "192.168.1.0/24", "256.1.1.1/24"),
         new RefinedCase<String>("CidrV6String", "cidr-v6-string", CidrV6String::of, CidrV6String::unsafeOf, "2001:db8::/32", "192.168.0.1/24"),
@@ -45,7 +53,11 @@ class FormatStringRefinedTest {
         new RefinedCase<String>("JwtString", "jwt-string", JwtString::of, JwtString::unsafeOf, "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.dBjftJeZ4CVP", "a.b"),
         new RefinedCase<String>("Iso8601DateString", "iso8601-date-string", Iso8601DateString::of, Iso8601DateString::unsafeOf, "2024-01-15", "2024-13-01"),
         new RefinedCase<String>("Iso8601TimeString", "iso8601-time-string", Iso8601TimeString::of, Iso8601TimeString::unsafeOf, "14:30:00", "25:00:00"),
-        new RefinedCase<String>("Iso8601DateTimeString", "iso8601-datetime-string", Iso8601DateTimeString::of, Iso8601DateTimeString::unsafeOf, "2024-01-15T14:30:00Z", "2024-01-15")
+        new RefinedCase<String>("Iso8601DateTimeString", "iso8601-datetime-string", Iso8601DateTimeString::of, Iso8601DateTimeString::unsafeOf, "2024-01-15T14:30:00Z", "2024-01-15"),
+        new RefinedCase<String>("Iso8601DurationString", "iso8601-duration-string", Iso8601DurationString::of, Iso8601DurationString::unsafeOf, "PT1H30M", "P1Y"),
+        new RefinedCase<String>("Iso8601PeriodString", "iso8601-period-string", Iso8601PeriodString::of, Iso8601PeriodString::unsafeOf, "P1Y2M3D", "PT1H"),
+        new RefinedCase<String>("TimeZoneIdString", "time-zone-id-string", TimeZoneIdString::of, TimeZoneIdString::unsafeOf, "Asia/Seoul", "Invalid/Zone"),
+        new RefinedCase<String>("HexColorString", "hex-color-string", HexColorString::of, HexColorString::unsafeOf, "#A1B2C3", "A1B2C3")
     );
 
     @TestFactory
@@ -233,6 +245,54 @@ class FormatStringRefinedTest {
         assertEquals("", Base64String.of("").get().value());
         assertEquals("SGVsbG8", Base64String.of("SGVsbG8").get().value());
         assertEquals("base64-string", Base64String.of("===").getError().code());
+    }
+
+    @Test
+    void base64UrlStringEdgeCases() {
+        assertEquals("", Base64UrlString.of("").get().value());
+        assertEquals("Zg==", Base64UrlString.of("Zg==").get().value());
+        assertEquals("____", Base64UrlString.of("____").get().value());
+        assertEquals("base64-url-string", Base64UrlString.of("a+b").getError().code());
+        assertEquals("base64-url-string", Base64UrlString.of("a/b").getError().code());
+    }
+
+    @Test
+    void ulidStringAcceptsLowercaseAndRejectsInvalidChars() {
+        assertEquals("01ARZ3NDEKTSV4RRFFQ69G5FAV", UlidString.of("01ARZ3NDEKTSV4RRFFQ69G5FAV").get().value());
+        assertEquals("01arz3ndektsv4rrffq69g5fav", UlidString.of("01arz3ndektsv4rrffq69g5fav").get().value());
+        assertEquals("ulid-string", UlidString.of("01ARZ3NDEKTSV4RRFFQ69G5FAI").getError().code());
+        assertEquals("ulid-string", UlidString.of("01ARZ3NDEKTSV4RRFFQ69G5FA").getError().code());
+    }
+
+    @Test
+    void hexColorStringSupportsRgbAndRgba() {
+        assertEquals("#FFF", HexColorString.of("#FFF").get().value());
+        assertEquals("#ffcc00", HexColorString.of("#ffcc00").get().value());
+        assertEquals("#11223344", HexColorString.of("#11223344").get().value());
+        assertEquals("hex-color-string", HexColorString.of("#1234").getError().code());
+        assertEquals("hex-color-string", HexColorString.of("##123").getError().code());
+        assertEquals("hex-color-string", HexColorString.of("#12").getError().code());
+    }
+
+    @Test
+    void iso8601DurationStringAcceptsDaysAndRejectsYears() {
+        assertEquals("P2D", Iso8601DurationString.of("P2D").get().value());
+        assertEquals("iso8601-duration-string", Iso8601DurationString.of("P1Y").getError().code());
+        assertEquals("iso8601-duration-string", Iso8601DurationString.of("PT").getError().code());
+    }
+
+    @Test
+    void iso8601PeriodStringRejectsTimeComponents() {
+        assertEquals("P0D", Iso8601PeriodString.of("P0D").get().value());
+        assertEquals("iso8601-period-string", Iso8601PeriodString.of("P1Y2M3DT4H").getError().code());
+    }
+
+    @Test
+    void timeZoneIdStringAcceptsOffsets() {
+        assertEquals("UTC", TimeZoneIdString.of("UTC").get().value());
+        assertEquals("Z", TimeZoneIdString.of("Z").get().value());
+        assertEquals("+09:00", TimeZoneIdString.of("+09:00").get().value());
+        assertEquals("time-zone-id-string", TimeZoneIdString.of("UTC+25:00").getError().code());
     }
 
     @Test
