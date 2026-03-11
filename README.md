@@ -513,7 +513,7 @@ The full matrix is kept in [docs/type-matrix.md](docs/type-matrix.md).
 ## Compatibility
 
 - production baseline: Java 8
-- run Gradle on JDK 17+ (tested with JDK 21)
+- Java 8+ supported
 - verification:
   - `./gradlew clean check`
   - `./gradlew testJava8`
