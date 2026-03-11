@@ -24,10 +24,10 @@ Java Refined currently exposes these type families.
 - `NonEmptyString`, `NonBlankString`, `TrimmedString`, `UuidString`, `UriString`
 - `EmailString`, `AsciiString`, `AlphabeticString`, `NumericString`, `AlphanumericString`
 - `SlugString`, `LowerCaseString`, `UpperCaseString`
-- `RegexString`, `UrlString`, `Ipv4String`, `Ipv6String`, `HexString`, `XmlString`, `XPathString`
-- `Base64String`, `JsonString`, `CidrV4String`, `CidrV6String`, `MacAddressString`, `SemVerString`
+- `RegexString`, `UrlString`, `Ipv4String`, `Ipv6String`, `HexString`, `HexColorString`, `XmlString`, `XPathString`
+- `Base64String`, `Base64UrlString`, `UlidString`, `JsonString`, `CidrV4String`, `CidrV6String`, `MacAddressString`, `SemVerString`
 - `CreditCardString`, `IsbnString`, `HostnameString`, `JwtString`
-- `Iso8601DateString`, `Iso8601TimeString`, `Iso8601DateTimeString`
+- `Iso8601DateString`, `Iso8601TimeString`, `Iso8601DateTimeString`, `Iso8601DurationString`, `Iso8601PeriodString`, `TimeZoneIdString`
 - `ValidByteString`, `ValidShortString`, `ValidIntString`, `ValidLongString`
 - `ValidFloatString`, `ValidDoubleString`, `ValidBigIntegerString`, `ValidBigDecimalString`
 

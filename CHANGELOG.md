@@ -12,8 +12,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - standalone OSS repository metadata and release-preparation files
 - GitHub workflow, issue template, and PR template definitions
 - Maven Central staging and JReleaser configuration for local release dry-runs
-- refined string types: `Base64String`, `JsonString`, `CidrV4String`, `CidrV6String`, `MacAddressString`, `SemVerString`,
-  `CreditCardString`, `IsbnString`, `HostnameString`, `JwtString`, `Iso8601DateString`, `Iso8601TimeString`, `Iso8601DateTimeString`
+- refined string types: `Base64String`, `Base64UrlString`, `UlidString`, `HexColorString`, `JsonString`, `CidrV4String`, `CidrV6String`,
+  `MacAddressString`, `SemVerString`, `CreditCardString`, `IsbnString`, `HostnameString`, `JwtString`, `Iso8601DateString`,
+  `Iso8601TimeString`, `Iso8601DateTimeString`, `Iso8601DurationString`, `Iso8601PeriodString`, `TimeZoneIdString`
 - refined numeric types: `ZeroToOneDouble`, `ZeroToOneFloat`; refined character type: `SpecialChar`
 - new predicates: `ModuloInt`, `ModuloLong`, `NonDivisibleByInt`, `NonDivisibleByLong`, `NonDivisibleByBigInteger`,
   `AscendingList`, `DescendingList`, `IsSpecialChar`

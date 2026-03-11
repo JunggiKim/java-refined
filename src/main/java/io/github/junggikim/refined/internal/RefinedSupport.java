@@ -11,8 +11,11 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URL;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.Period;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -56,6 +59,8 @@ public final class RefinedSupport {
     private static final Pattern SLUG_PATTERN = Pattern.compile("^[a-z0-9]+(?:-[a-z0-9]+)*$");
     private static final Pattern IPV4_PATTERN = Pattern.compile("^(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}$");
     private static final Pattern HEX_PATTERN = Pattern.compile("^[0-9A-Fa-f]+$");
+    private static final Pattern HEX_COLOR_PATTERN = Pattern.compile("^#(?:[0-9A-Fa-f]{3}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$");
+    private static final Pattern ULID_PATTERN = Pattern.compile("^[0-9A-HJKMNP-TV-Z]{26}$");
     private static final Pattern MAC_COLON = Pattern.compile("^[0-9A-Fa-f]{2}(:[0-9A-Fa-f]{2}){5}$");
     private static final Pattern MAC_DASH = Pattern.compile("^[0-9A-Fa-f]{2}(-[0-9A-Fa-f]{2}){5}$");
     private static final Pattern MAC_DOT = Pattern.compile("^[0-9A-Fa-f]{4}\\.[0-9A-Fa-f]{4}\\.[0-9A-Fa-f]{4}$");
@@ -746,6 +751,10 @@ public final class RefinedSupport {
         return require("hex-string", "value must be a valid hexadecimal string", value -> !value.isEmpty() && HEX_PATTERN.matcher(value).matches());
     }
 
+    public static Constraint<String> hexColorString() {
+        return require("hex-color-string", "value must be a valid hex color", value -> HEX_COLOR_PATTERN.matcher(value).matches());
+    }
+
     public static Constraint<String> xmlString() {
         return parsedString("xml-string", "value must be valid XML", value -> {
             DocumentBuilder builder = secureXmlFactory().newDocumentBuilder();
@@ -797,6 +806,15 @@ public final class RefinedSupport {
 
     public static Constraint<String> base64String() {
         return parsedString("base64-string", "value must be valid Base64", value -> Base64.getDecoder().decode(value));
+    }
+
+    public static Constraint<String> base64UrlString() {
+        return parsedString("base64-url-string", "value must be valid Base64 URL", value -> Base64.getUrlDecoder().decode(value));
+    }
+
+    public static Constraint<String> ulidString() {
+        return require("ulid-string", "value must be a valid ULID",
+            value -> ULID_PATTERN.matcher(value.toUpperCase(Locale.ROOT)).matches());
     }
 
     public static Constraint<String> jsonString() {
@@ -870,6 +888,18 @@ public final class RefinedSupport {
     public static Constraint<String> iso8601DateTimeString() {
         return parsedString("iso8601-datetime-string", "value must be a valid ISO 8601 date-time",
             value -> DateTimeFormatter.ISO_DATE_TIME.parse(value));
+    }
+
+    public static Constraint<String> iso8601DurationString() {
+        return parsedString("iso8601-duration-string", "value must be a valid ISO 8601 duration", Duration::parse);
+    }
+
+    public static Constraint<String> iso8601PeriodString() {
+        return parsedString("iso8601-period-string", "value must be a valid ISO 8601 period", Period::parse);
+    }
+
+    public static Constraint<String> timeZoneIdString() {
+        return parsedString("time-zone-id-string", "value must be a valid time zone id", ZoneId::of);
     }
 
     public static Constraint<Character> digitChar() {
