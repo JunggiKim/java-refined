@@ -36,7 +36,7 @@ jobs:
           echo "${JAVA_HOME_21_X64}/bin" >> "$GITHUB_PATH"
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Verify build, quality gates, Java 8 compatibility, and coverage
         run: ./gradlew clean check testJava8 jacocoTestReport
