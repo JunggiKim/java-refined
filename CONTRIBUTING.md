@@ -22,18 +22,13 @@ Use this baseline verification command for normal changes:
 ./gradlew clean check testJava8 jacocoTestReport
 ```
 
-Run the release pipeline when the release or publication flow changes:
-
-```bash
-./gradlew prepareRelease
-./gradlew verifyJreleaserConfig   # optional, requires release secrets
-```
+No additional release pipeline is required.
 
 ## Branch and Commit Expectations
 
 - use small, reviewable commits
 - keep unrelated refactors out of feature or bug-fix changes
-- update documentation when public behavior or release workflow changes
+- update documentation when public behavior changes
 - keep `CHANGELOG.md` aligned with release-facing changes
 
 ## Pull Requests
@@ -49,7 +44,6 @@ Each pull request should include:
 
 - group/artifact/package coordinates
 - Java baseline
-- release workflow secret names
 - `Automatic-Module-Name`
 - coverage verification rules
 
