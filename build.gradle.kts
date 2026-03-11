@@ -17,7 +17,7 @@ plugins {
     checkstyle
     pmd
     id("com.github.spotbugs") version "6.4.8"
-    id("org.jreleaser") version "1.22.0"
+    id("org.jreleaser") version "1.23.0"
 }
 
 val groupId = property("group") as String
