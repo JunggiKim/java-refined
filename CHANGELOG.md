@@ -7,8 +7,15 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-03-11
+
 ### Added
 
+- Java 8+ refinement type library core
+- numeric, character, string, and non-empty collection refined wrappers
+- functional control types: `Option`, `Either`, `Try`, `Ior`, `Validated`
+- composable predicate catalog
+- JUnit 5 TDD suite with full JaCoCo coverage
 - standalone OSS repository metadata and contribution files
 - GitHub workflow, issue template, and PR template definitions
 - refined string types: `Base64String`, `Base64UrlString`, `UlidString`, `HexColorString`, `JsonString`, `CidrV4String`, `CidrV6String`,
@@ -25,13 +32,3 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ### Removed
 
 - Maven Central/JReleaser release pipeline and documentation
-
-## [0.1.0] - Planned
-
-### Added
-
-- Java 8+ refinement type library core
-- numeric, character, string, and non-empty collection refined wrappers
-- functional control types: `Option`, `Either`, `Try`, `Ior`, `Validated`
-- composable predicate catalog
-- JUnit 5 TDD suite with full JaCoCo coverage

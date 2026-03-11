@@ -24,18 +24,18 @@ distribute it in personal or commercial codebases.
 
 ## Contents
 
-- Why
-- Installation
-- Basic Usage
-- Error Handling
-- Core Concepts
-- Core API
-- Supported Types
-- Design Rules
-- Compatibility
-- Project Status
-- Contributing and Security
-- License
+- [Why](#why)
+- [Installation](#installation)
+- [Coordinates](#coordinates)
+- [Basic Usage](#basic-usage)
+- [Error Handling](#error-handling)
+- [Core Concepts](#core-concepts)
+- [Core API](#core-api)
+- [Supported Types](#supported-types)
+- [Compatibility](#compatibility)
+- [Project Status](#project-status)
+- [Contributing and Security](#contributing-and-security)
+- [License](#license)
 
 ## Why
 
@@ -74,7 +74,7 @@ repositories {
 }
 
 dependencies {
-    implementation("io.github.junggikim:java-refined:0.1.0-SNAPSHOT")
+    implementation("io.github.junggikim:java-refined:1.0.0")
 }
 ```
 
@@ -86,7 +86,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.github.junggikim:java-refined:0.1.0-SNAPSHOT'
+    implementation 'io.github.junggikim:java-refined:1.0.0'
 }
 ```
 
@@ -96,7 +96,7 @@ dependencies {
 <dependency>
   <groupId>io.github.junggikim</groupId>
   <artifactId>java-refined</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 
@@ -163,97 +163,357 @@ Refined wrappers expose two constructors:
   - stable `code`, human-readable `message`, immutable `metadata`
   - collection constructors distinguish `*-empty`, `*-null-element`, `*-null-key`, `*-null-value`, and sorted/navigable `*-invalid-*` failures
 
-## Design Rules
-
-- Java-only production code
-- Java 8 baseline bytecode and API compatibility
-- runtime dependency `0`
-- JUnit 5-based TDD
-- `checkstyle`, `spotbugs`, and `pmd` quality gates in `check`
-- JaCoCo `100%` coverage across instruction, branch, line, complexity, method, and class
-- immutable value types and defensive collection snapshots
-
 ## Supported Types
+
+The library ships with refined wrappers, control types, and predicate catalogs.
+Each table lists a type and the invariant it enforces.
 
 ### Refined Wrappers — Numeric
 
-- `PositiveInt`, `NegativeInt`, `NonNegativeInt`, `NonPositiveInt`, `NonZeroInt`, `NaturalInt`
-- `PositiveLong`, `NegativeLong`, `NonNegativeLong`, `NonPositiveLong`, `NonZeroLong`, `NaturalLong`
-- `PositiveByte`, `NegativeByte`, `NonNegativeByte`, `NonPositiveByte`, `NonZeroByte`, `NaturalByte`
-- `PositiveShort`, `NegativeShort`, `NonNegativeShort`, `NonPositiveShort`, `NonZeroShort`, `NaturalShort`
-- `PositiveFloat`, `NegativeFloat`, `NonNegativeFloat`, `NonPositiveFloat`, `NonZeroFloat`, `FiniteFloat`, `NonNaNFloat`, `ZeroToOneFloat`
-- `PositiveDouble`, `NegativeDouble`, `NonNegativeDouble`, `NonPositiveDouble`, `NonZeroDouble`, `FiniteDouble`, `NonNaNDouble`, `ZeroToOneDouble`
-- `PositiveBigInteger`, `NegativeBigInteger`, `NonNegativeBigInteger`, `NonPositiveBigInteger`, `NonZeroBigInteger`, `NaturalBigInteger`
-- `PositiveBigDecimal`, `NegativeBigDecimal`, `NonNegativeBigDecimal`, `NonPositiveBigDecimal`, `NonZeroBigDecimal`
+#### Int
+
+| Type | Description |
+| --- | --- |
+| `PositiveInt` | `int > 0` |
+| `NegativeInt` | `int < 0` |
+| `NonNegativeInt` | `int >= 0` |
+| `NonPositiveInt` | `int <= 0` |
+| `NonZeroInt` | `int != 0` |
+| `NaturalInt` | `int >= 0` |
+
+#### Long
+
+| Type | Description |
+| --- | --- |
+| `PositiveLong` | `long > 0` |
+| `NegativeLong` | `long < 0` |
+| `NonNegativeLong` | `long >= 0` |
+| `NonPositiveLong` | `long <= 0` |
+| `NonZeroLong` | `long != 0` |
+| `NaturalLong` | `long >= 0` |
+
+#### Byte
+
+| Type | Description |
+| --- | --- |
+| `PositiveByte` | `byte > 0` |
+| `NegativeByte` | `byte < 0` |
+| `NonNegativeByte` | `byte >= 0` |
+| `NonPositiveByte` | `byte <= 0` |
+| `NonZeroByte` | `byte != 0` |
+| `NaturalByte` | `byte >= 0` |
+
+#### Short
+
+| Type | Description |
+| --- | --- |
+| `PositiveShort` | `short > 0` |
+| `NegativeShort` | `short < 0` |
+| `NonNegativeShort` | `short >= 0` |
+| `NonPositiveShort` | `short <= 0` |
+| `NonZeroShort` | `short != 0` |
+| `NaturalShort` | `short >= 0` |
+
+#### Float
+
+| Type | Description |
+| --- | --- |
+| `PositiveFloat` | finite float > 0 |
+| `NegativeFloat` | finite float < 0 |
+| `NonNegativeFloat` | finite float >= 0 |
+| `NonPositiveFloat` | finite float <= 0 |
+| `NonZeroFloat` | finite float != 0 |
+| `FiniteFloat` | finite float (not NaN/Infinity) |
+| `NonNaNFloat` | float is not NaN (Infinity allowed) |
+| `ZeroToOneFloat` | finite float in [0, 1] |
+
+#### Double
+
+| Type | Description |
+| --- | --- |
+| `PositiveDouble` | finite double > 0 |
+| `NegativeDouble` | finite double < 0 |
+| `NonNegativeDouble` | finite double >= 0 |
+| `NonPositiveDouble` | finite double <= 0 |
+| `NonZeroDouble` | finite double != 0 |
+| `FiniteDouble` | finite double (not NaN/Infinity) |
+| `NonNaNDouble` | double is not NaN (Infinity allowed) |
+| `ZeroToOneDouble` | finite double in [0, 1] |
+
+#### BigInteger
+
+| Type | Description |
+| --- | --- |
+| `PositiveBigInteger` | `BigInteger > 0` |
+| `NegativeBigInteger` | `BigInteger < 0` |
+| `NonNegativeBigInteger` | `BigInteger >= 0` |
+| `NonPositiveBigInteger` | `BigInteger <= 0` |
+| `NonZeroBigInteger` | `BigInteger != 0` |
+| `NaturalBigInteger` | `BigInteger >= 0` |
+
+#### BigDecimal
+
+| Type | Description |
+| --- | --- |
+| `PositiveBigDecimal` | `BigDecimal > 0` |
+| `NegativeBigDecimal` | `BigDecimal < 0` |
+| `NonNegativeBigDecimal` | `BigDecimal >= 0` |
+| `NonPositiveBigDecimal` | `BigDecimal <= 0` |
+| `NonZeroBigDecimal` | `BigDecimal != 0` |
 
 ### Refined Wrappers — Character
 
-- `DigitChar`, `LetterChar`, `LetterOrDigitChar`, `LowerCaseChar`, `UpperCaseChar`, `WhitespaceChar`, `SpecialChar`
+| Type | Description |
+| --- | --- |
+| `DigitChar` | Unicode digit (`Character.isDigit`) |
+| `LetterChar` | Unicode letter (`Character.isLetter`) |
+| `LetterOrDigitChar` | Unicode letter or digit (`Character.isLetterOrDigit`) |
+| `LowerCaseChar` | Unicode lower-case (`Character.isLowerCase`) |
+| `UpperCaseChar` | Unicode upper-case (`Character.isUpperCase`) |
+| `WhitespaceChar` | Unicode whitespace (`Character.isWhitespace`) |
+| `SpecialChar` | not letter, digit, whitespace, or space |
 
 ### Refined Wrappers — String
 
-- `NonEmptyString`, `NonBlankString`, `TrimmedString`, `UuidString`, `UriString`
-- `EmailString`, `AsciiString`, `AlphabeticString`, `NumericString`, `AlphanumericString`
-- `SlugString`, `LowerCaseString`, `UpperCaseString`
-- `RegexString`, `UrlString`, `Ipv4String`, `Ipv6String`, `HexString`, `HexColorString`, `XmlString`, `XPathString`
-- `Base64String`, `Base64UrlString`, `UlidString`, `JsonString`, `CidrV4String`, `CidrV6String`, `MacAddressString`, `SemVerString`
-- `CreditCardString`, `IsbnString`, `HostnameString`, `JwtString`
-- `Iso8601DateString`, `Iso8601TimeString`, `Iso8601DateTimeString`, `Iso8601DurationString`, `Iso8601PeriodString`, `TimeZoneIdString`
-- `ValidByteString`, `ValidShortString`, `ValidIntString`, `ValidLongString`
-- `ValidFloatString`, `ValidDoubleString`, `ValidBigIntegerString`, `ValidBigDecimalString`
+#### Whitespace and Case
+
+| Type | Description |
+| --- | --- |
+| `NonEmptyString` | not empty |
+| `NonBlankString` | not blank (Unicode whitespace) |
+| `TrimmedString` | no leading or trailing Unicode whitespace |
+| `LowerCaseString` | equals `toLowerCase(Locale.ROOT)` |
+| `UpperCaseString` | equals `toUpperCase(Locale.ROOT)` |
+
+#### Character Sets and Slugs
+
+| Type | Description |
+| --- | --- |
+| `AsciiString` | ASCII only (U+0000..U+007F) |
+| `AlphabeticString` | non-empty; letters only |
+| `NumericString` | non-empty; digits only |
+| `AlphanumericString` | non-empty; letters or digits only |
+| `SlugString` | lower-case slug `a-z0-9` with hyphens |
+
+#### Identifiers and Tokens
+
+| Type | Description |
+| --- | --- |
+| `UuidString` | valid UUID |
+| `UlidString` | valid ULID (Crockford Base32, 26 chars) |
+| `JwtString` | three Base64URL parts separated by dots |
+| `SemVerString` | Semantic Versioning 2.0.0 pattern |
+| `CreditCardString` | Luhn-valid 13-19 digits (spaces/hyphens allowed) |
+| `IsbnString` | valid ISBN-10 or ISBN-13 (spaces/hyphens allowed) |
+
+#### URIs and URLs
+
+| Type | Description |
+| --- | --- |
+| `UriString` | parseable by `java.net.URI` |
+| `UrlString` | parseable by `java.net.URL` |
+
+#### Network
+
+| Type | Description |
+| --- | --- |
+| `Ipv4String` | IPv4 dotted-quad |
+| `Ipv6String` | IPv6 address |
+| `CidrV4String` | IPv4 CIDR with prefix `/0-32` |
+| `CidrV6String` | IPv6 CIDR with prefix `/0-128` |
+| `MacAddressString` | MAC address with `:`/`-`/`.` separators |
+| `HostnameString` | hostname labels (1-63 chars, letters/digits/hyphen), total length <= 253 |
+
+#### Encodings and Structured Formats
+
+| Type | Description |
+| --- | --- |
+| `EmailString` | well-formed email shape (basic local@domain rules) |
+| `RegexString` | valid regular expression |
+| `HexString` | non-empty hex string |
+| `HexColorString` | `#RGB`, `#RRGGBB`, or `#RRGGBBAA` |
+| `Base64String` | valid Base64 (JDK decoder) |
+| `Base64UrlString` | valid Base64 URL-safe (JDK decoder) |
+| `JsonString` | valid JSON |
+| `XmlString` | well-formed XML |
+| `XPathString` | valid XPath expression |
+
+#### Date and Time
+
+| Type | Description |
+| --- | --- |
+| `Iso8601DateString` | ISO-8601 date (`LocalDate.parse`) |
+| `Iso8601TimeString` | ISO-8601 time (`LocalTime.parse`) |
+| `Iso8601DateTimeString` | ISO-8601 date-time (`ISO_DATE_TIME`) |
+| `Iso8601DurationString` | ISO-8601 duration (`Duration.parse`) |
+| `Iso8601PeriodString` | ISO-8601 period (`Period.parse`) |
+| `TimeZoneIdString` | valid `ZoneId` |
+
+#### Numeric Parsing
+
+| Type | Description |
+| --- | --- |
+| `ValidByteString` | parseable by `Byte.parseByte` |
+| `ValidShortString` | parseable by `Short.parseShort` |
+| `ValidIntString` | parseable by `Integer.parseInt` |
+| `ValidLongString` | parseable by `Long.parseLong` |
+| `ValidFloatString` | parseable by `Float.parseFloat` (NaN/Infinity allowed) |
+| `ValidDoubleString` | parseable by `Double.parseDouble` (NaN/Infinity allowed) |
+| `ValidBigIntegerString` | parseable by `new BigInteger(...)` |
+| `ValidBigDecimalString` | parseable by `new BigDecimal(...)` |
 
 ### Refined Wrappers — Collection
 
-- `NonEmptyList`, `NonEmptySet`, `NonEmptyMap`, `NonEmptyDeque`, `NonEmptyIterable`
-- `NonEmptyQueue`, `NonEmptySortedSet`, `NonEmptySortedMap`, `NonEmptyNavigableSet`, `NonEmptyNavigableMap`
+| Type | Description |
+| --- | --- |
+| `NonEmptyList` | non-empty list with no null elements; immutable snapshot |
+| `NonEmptySet` | non-empty set with no null elements; immutable snapshot |
+| `NonEmptyMap` | non-empty map with no null keys/values; immutable snapshot |
+| `NonEmptyDeque` | non-empty deque snapshot as immutable list; no null elements |
+| `NonEmptyQueue` | non-empty queue snapshot as immutable list; no null elements |
+| `NonEmptyIterable` | non-empty iterable snapshot as immutable list; no null elements |
+| `NonEmptySortedSet` | non-empty sorted set with no null elements; immutable snapshot |
+| `NonEmptySortedMap` | non-empty sorted map with no null keys/values; immutable snapshot |
+| `NonEmptyNavigableSet` | non-empty navigable set with no null elements; immutable snapshot |
+| `NonEmptyNavigableMap` | non-empty navigable map with no null keys/values; immutable snapshot |
 
 ### Control Types
 
-- `Option`
-- `Either`
-- `Try`
-- `Ior`
-- `Validated`
+| Type | Description |
+| --- | --- |
+| `Option` | optional value (`Some` or `None`) |
+| `Either` | left or right branch |
+| `Try` | success or captured exception |
+| `Ior` | inclusive-or: left, right, or both |
+| `Validated` | error-accumulating validation result |
 
-### Predicates — Numeric
+### Predicates — Numeric (Comparison)
 
-- `GreaterThan`, `GreaterOrEqual`, `LessThan`, `LessOrEqual`, `EqualTo`, `NotEqualTo`
-- `OpenInterval`, `ClosedInterval`, `OpenClosedInterval`, `ClosedOpenInterval`
-- `EvenInt`, `OddInt`, `EvenLong`, `OddLong`, `EvenBigInteger`, `OddBigInteger`
-- `DivisibleByInt`, `DivisibleByLong`, `DivisibleByBigInteger`
-- `ModuloInt`, `ModuloLong`, `NonDivisibleByInt`, `NonDivisibleByLong`, `NonDivisibleByBigInteger`
-- `FiniteFloatPredicate`, `FiniteDoublePredicate`, `NonNaNFloatPredicate`, `NonNaNDoublePredicate`
+| Predicate | Description |
+| --- | --- |
+| `GreaterThan` | value > bound |
+| `GreaterOrEqual` | value >= bound |
+| `LessThan` | value < bound |
+| `LessOrEqual` | value <= bound |
+| `EqualTo` | value == bound |
+| `NotEqualTo` | value != bound |
+
+### Predicates — Numeric (Intervals)
+
+| Predicate | Description |
+| --- | --- |
+| `OpenInterval` | min < value < max |
+| `ClosedInterval` | min <= value <= max |
+| `OpenClosedInterval` | min < value <= max |
+| `ClosedOpenInterval` | min <= value < max |
+
+### Predicates — Numeric (Parity)
+
+| Predicate | Description |
+| --- | --- |
+| `EvenInt` | int is even |
+| `OddInt` | int is odd |
+| `EvenLong` | long is even |
+| `OddLong` | long is odd |
+| `EvenBigInteger` | BigInteger is even |
+| `OddBigInteger` | BigInteger is odd |
+
+### Predicates — Numeric (Divisibility)
+
+| Predicate | Description |
+| --- | --- |
+| `DivisibleByInt` | value % divisor == 0 |
+| `DivisibleByLong` | value % divisor == 0 |
+| `DivisibleByBigInteger` | value mod divisor == 0 |
+| `NonDivisibleByInt` | value % divisor != 0 |
+| `NonDivisibleByLong` | value % divisor != 0 |
+| `NonDivisibleByBigInteger` | value mod divisor != 0 |
+| `ModuloInt` | value % divisor == remainder |
+| `ModuloLong` | value % divisor == remainder |
+
+### Predicates — Numeric (Float/Double)
+
+| Predicate | Description |
+| --- | --- |
+| `FiniteFloatPredicate` | float is finite |
+| `FiniteDoublePredicate` | double is finite |
+| `NonNaNFloatPredicate` | float is not NaN (Infinity allowed) |
+| `NonNaNDoublePredicate` | double is not NaN (Infinity allowed) |
 
 ### Predicates — String
 
-- `NotEmpty`, `NotBlank`, `LengthAtLeast`, `LengthAtMost`, `LengthBetween`
-- `MatchesRegex`, `StartsWith`, `EndsWith`, `Contains`
+| Predicate | Description |
+| --- | --- |
+| `NotEmpty` | string not empty |
+| `NotBlank` | string not blank (Unicode whitespace) |
+| `LengthAtLeast` | length >= minimum |
+| `LengthAtMost` | length <= maximum |
+| `LengthBetween` | minimum <= length <= maximum |
+| `MatchesRegex` | matches the regex pattern |
+| `StartsWith` | starts with prefix |
+| `EndsWith` | ends with suffix |
+| `Contains` | contains infix |
 
 ### Predicates — Boolean
 
-- `TrueValue`, `FalseValue`, `And`, `Or`, `Xor`, `Nand`, `Nor`, `OneOf`
+| Predicate | Description |
+| --- | --- |
+| `TrueValue` | value is true |
+| `FalseValue` | value is false |
+| `And` | all values in a list are true |
+| `Or` | at least one value in a list is true |
+| `Xor` | odd number of values in a list are true |
+| `Nand` | not all values in a list are true |
+| `Nor` | no values in a list are true |
+| `OneOf` | exactly one value in a list is true |
 
 ### Predicates — Character
 
-- `IsDigitChar`, `IsLetterChar`, `IsLetterOrDigitChar`, `IsLowerCaseChar`, `IsUpperCaseChar`, `IsWhitespaceChar`, `IsSpecialChar`
+| Predicate | Description |
+| --- | --- |
+| `IsDigitChar` | Unicode digit (`Character.isDigit`) |
+| `IsLetterChar` | Unicode letter (`Character.isLetter`) |
+| `IsLetterOrDigitChar` | Unicode letter or digit (`Character.isLetterOrDigit`) |
+| `IsLowerCaseChar` | Unicode lower-case (`Character.isLowerCase`) |
+| `IsUpperCaseChar` | Unicode upper-case (`Character.isUpperCase`) |
+| `IsWhitespaceChar` | Unicode whitespace (`Character.isWhitespace`) |
+| `IsSpecialChar` | not letter, digit, whitespace, or space |
 
 ### Predicates — Collection
 
-- `MinSize`, `MaxSize`, `SizeBetween`, `SizeEqual`
-- `ContainsElement`, `EmptyCollection`, `ForAllElements`, `ExistsElement`
-- `HeadSatisfies`, `LastSatisfies`, `IndexSatisfies`, `InitSatisfies`, `TailSatisfies`, `CountMatches`
-- `AscendingList`, `DescendingList`
+| Predicate | Description |
+| --- | --- |
+| `MinSize` | size >= minimum |
+| `MaxSize` | size <= maximum |
+| `SizeBetween` | minimum <= size <= maximum |
+| `SizeEqual` | size == expected |
+| `ContainsElement` | collection contains expected element |
+| `EmptyCollection` | collection is empty |
+| `ForAllElements` | all elements satisfy predicate |
+| `ExistsElement` | at least one element satisfies predicate |
+| `HeadSatisfies` | first element satisfies predicate (non-empty list) |
+| `LastSatisfies` | last element satisfies predicate (non-empty list) |
+| `IndexSatisfies` | element at index satisfies predicate |
+| `InitSatisfies` | init slice (all but last) satisfies predicate |
+| `TailSatisfies` | tail slice (all but first) satisfies predicate |
+| `CountMatches` | matching element count equals expected count |
+| `AscendingList` | list is non-decreasing |
+| `DescendingList` | list is non-increasing |
 
 ### Predicates — Logical
 
-- `AllOf`, `AnyOf`, `Not`
+| Predicate | Description |
+| --- | --- |
+| `AllOf` | all delegated constraints must pass |
+| `AnyOf` | at least one delegated constraint must pass |
+| `Not` | delegated constraint must fail |
 
 The full matrix is kept in [docs/type-matrix.md](docs/type-matrix.md).
 
 ## Compatibility
 
 - production baseline: Java 8
-- run Gradle on JDK 17+ (JDK 21 verified locally)
+- run Gradle on JDK 17+ (tested with JDK 21)
 - verification:
   - `./gradlew clean check`
   - `./gradlew testJava8`
@@ -265,9 +525,8 @@ See [docs/compatibility.md](docs/compatibility.md) for Java version caveats.
 
 ## Project Status
 
-- current local version line: `0.1.0-SNAPSHOT`
+- current local version line: `1.0.0`
 - distribution: source checkout and local Maven only
-- API may still evolve before `1.0.0`
 - release notes live in [CHANGELOG.md](CHANGELOG.md)
 
 ## Contributing and Security
