@@ -4,8 +4,7 @@
 
 - production baseline: Java 8
 - build target: Java 8 bytecode
-- run Gradle on JDK 17+ because Gradle 8.13 deprecates daemon JVM 16 and lower
-- CI builds run on JDK 21 to validate compatibility
+- Java 8+ supported
 - current Gradle build uses `--release 8` when running on JDK 9+
 - Java 8 runtime compatibility is verified through Gradle toolchains
 
