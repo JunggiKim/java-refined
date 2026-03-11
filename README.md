@@ -25,6 +25,7 @@ distribute it in personal or commercial codebases.
 ## Contents
 
 - [Why](#why)
+- [Terminology](#terminology)
 - [Installation](#installation)
 - [Coordinates](#coordinates)
 - [Basic Usage](#basic-usage)
@@ -48,6 +49,14 @@ Java applications often validate the same invariants repeatedly:
 
 Java Refined packages those invariants into reusable types and predicates so
 that "already validated" becomes part of the type system at the library level.
+
+## Terminology
+
+Validation means "a validation result". It contains either a valid value or an error.
+Violation means "a rule was broken". It carries a code, message, and optional metadata.
+
+You do not need functional programming to use this. Treat `Validation` as a result
+object with `isValid()`, `get()`, `getError()`, or `fold(...)`.
 
 ## Installation
 
@@ -118,6 +127,21 @@ Validation<Violation, NonEmptyList<String>> tags = NonEmptyList.of(Arrays.asList
 
 Validation<Violation, String> summary =
     name.zip(age, (n, a) -> n.value() + " (" + a.value() + ")");
+```
+
+More refined wrappers, including `NaturalInt` and `Ipv6String`:
+
+```java
+import io.github.junggikim.refined.refined.numeric.NaturalInt;
+import io.github.junggikim.refined.refined.string.Ipv6String;
+
+Validation<Violation, NaturalInt> retries = NaturalInt.of(3);
+Validation<Violation, Ipv6String> address = Ipv6String.of("2001:db8::1");
+
+String status = address.fold(
+    v -> "invalid ip: " + v.message(),
+    ok -> "ip ok: " + ok.value()
+);
 ```
 
 ## Error Handling
