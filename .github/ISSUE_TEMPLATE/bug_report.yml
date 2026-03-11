@@ -1,0 +1,36 @@
+name: Bug report
+description: Report a bug or behavioral regression.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting a bug. Please provide enough detail to reproduce it.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Include sample code, input, and observed output.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Affected version
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Java version, OS, build tool, and any other relevant details.
+

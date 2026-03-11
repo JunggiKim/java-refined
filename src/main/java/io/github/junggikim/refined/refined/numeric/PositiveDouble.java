@@ -1,0 +1,25 @@
+package io.github.junggikim.refined.refined.numeric;
+
+import io.github.junggikim.refined.core.Constraint;
+import io.github.junggikim.refined.internal.AbstractRefined;
+import io.github.junggikim.refined.internal.RefinedSupport;
+import io.github.junggikim.refined.newtype.Newtype;
+import io.github.junggikim.refined.validation.Validation;
+import io.github.junggikim.refined.violation.Violation;
+
+public final class PositiveDouble extends AbstractRefined<Double> implements Newtype<Double> {
+
+    private static final Constraint<Double> CONSTRAINT = RefinedSupport.positiveDouble();
+
+    private PositiveDouble(Double value) {
+        super(value);
+    }
+
+    public static Validation<Violation, PositiveDouble> of(Double value) {
+        return RefinedSupport.refine(value, CONSTRAINT, PositiveDouble::new);
+    }
+
+    public static PositiveDouble unsafeOf(Double value) {
+        return RefinedSupport.unsafeRefine(value, CONSTRAINT, PositiveDouble::new);
+    }
+}

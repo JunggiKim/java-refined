@@ -1,0 +1,41 @@
+gitRootSearch: true
+
+project:
+  name: java-refined
+  description: Refinement and functional value types for Java 8+.
+  longDescription: >
+    Java Refined provides refinement types, non-empty collections, and
+    lightweight functional control types for Java without runtime dependencies.
+  authors:
+    - Junggi Kim
+  license: Apache-2.0
+  inceptionYear: "2026"
+  links:
+    homepage: https://github.com/JunggiKim/java-refined
+    documentation: https://github.com/JunggiKim/java-refined#readme
+    license: https://www.apache.org/licenses/LICENSE-2.0.txt
+
+release:
+  github:
+    owner: JunggiKim
+    name: java-refined
+    skipTag: true
+    draft: true
+    overwrite: false
+    changelog:
+      formatted: ALWAYS
+
+signing:
+  active: RELEASE
+  armored: true
+
+deploy:
+  maven:
+    mavenCentral:
+      sonatype:
+        active: RELEASE
+        url: https://central.sonatype.com/api/v1/publisher
+        sign: true
+        applyMavenCentralRules: true
+        stagingRepositories:
+          - build/staging-deploy
