@@ -606,22 +606,18 @@ public final class RefinedSupport {
     }
 
     public static <T extends Comparable<T>> Constraint<T> openInterval(T minimum, T maximum, String code, String message) {
-        validateIntervalBounds(minimum, maximum, false, "open interval");
         return require(code, message, value -> value.compareTo(minimum) > 0 && value.compareTo(maximum) < 0);
     }
 
     public static <T extends Comparable<T>> Constraint<T> closedInterval(T minimum, T maximum, String code, String message) {
-        validateIntervalBounds(minimum, maximum, true, "closed interval");
         return require(code, message, value -> value.compareTo(minimum) >= 0 && value.compareTo(maximum) <= 0);
     }
 
     public static <T extends Comparable<T>> Constraint<T> openClosedInterval(T minimum, T maximum, String code, String message) {
-        validateIntervalBounds(minimum, maximum, false, "open-closed interval");
         return require(code, message, value -> value.compareTo(minimum) > 0 && value.compareTo(maximum) <= 0);
     }
 
     public static <T extends Comparable<T>> Constraint<T> closedOpenInterval(T minimum, T maximum, String code, String message) {
-        validateIntervalBounds(minimum, maximum, false, "closed-open interval");
         return require(code, message, value -> value.compareTo(minimum) >= 0 && value.compareTo(maximum) < 0);
     }
 

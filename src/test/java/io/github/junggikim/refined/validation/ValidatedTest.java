@@ -67,4 +67,10 @@ class ValidatedTest {
         assertThrows(NullPointerException.class, () -> Validated.invalid(null));
         assertThrows(NullPointerException.class, () -> Validated.invalid(listOf("e1", null)));
     }
+
+    @Test
+    void validatedHashCodesAreNonZero() {
+        assertNotEquals(0, Validated.valid(3).hashCode());
+        assertNotEquals(0, Validated.invalid(listOf("e1")).hashCode());
+    }
 }

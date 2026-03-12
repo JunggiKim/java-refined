@@ -15,6 +15,7 @@ plugins {
     checkstyle
     pmd
     id("com.github.spotbugs") version "6.4.8"
+    id("info.solidsoft.pitest") version "1.15.0"
 }
 
 val groupId = property("group") as String
@@ -162,6 +163,18 @@ tasks.jacocoTestCoverageVerification {
             }
         }
     }
+}
+
+pitest {
+    junit5PluginVersion.set("1.2.1")
+    targetClasses.set(listOf("io.github.junggikim.refined.*"))
+    targetTests.set(listOf("io.github.junggikim.refined.*"))
+    threads.set(Runtime.getRuntime().availableProcessors())
+    outputFormats.set(listOf("XML", "HTML"))
+    timestampedReports.set(false)
+    mutators.set(listOf("DEFAULTS"))
+    mutationThreshold.set(95)
+    excludedMethods.set(listOf("secureXmlFactory"))
 }
 
 tasks.named("check") {
