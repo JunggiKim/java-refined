@@ -14,6 +14,7 @@ import java.util.AbstractMap
 import java.util.ArrayList
 import java.util.Comparator
 import java.util.LinkedHashMap
+import kotlin.jvm.JvmName
 
 class KNonEmptyList<T> internal constructor(
     private val delegate: NonEmptyList<T>
@@ -58,6 +59,7 @@ class KNonEmptyQueue<T> internal constructor(
 
     fun element(): T = delegate.element()
 
+    @get:JvmName("lastValue")
     val last: T
         get() = delegate.last()
 
@@ -67,9 +69,11 @@ class KNonEmptyQueue<T> internal constructor(
 class KNonEmptyDeque<T> internal constructor(
     private val delegate: NonEmptyDeque<T>
 ) : List<T> by delegate {
+    @get:JvmName("firstValue")
     val first: T
         get() = delegate.first()
 
+    @get:JvmName("lastValue")
     val last: T
         get() = delegate.last()
 
