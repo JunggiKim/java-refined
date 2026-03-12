@@ -255,4 +255,11 @@ class AdditionalPredicateTypesTest {
             DynamicTest.dynamicTest(displayName + " rejects null", () -> assertEquals(code, predicate.validate(null).getError().code()))
         );
     }
+
+    @Test
+    void indexSatisfiesValidatesAtIndexZero() {
+        Constraint<List<Integer>> c = new IndexSatisfies<>(0, v -> v == 1);
+        assertEquals(listOf(1, 2, 3), c.validate(listOf(1, 2, 3)).get());
+        assertEquals("index-satisfies", c.validate(listOf(2, 1, 3)).getError().code());
+    }
 }

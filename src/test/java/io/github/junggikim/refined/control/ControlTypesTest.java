@@ -58,6 +58,11 @@ class ControlTypesTest {
             assertThrows(NullPointerException.class, () -> some.flatMap(value -> null));
         }
 
+        @Test
+        void someHashCodeIsNonZero() {
+            assertNotEquals(0, Option.some(1).hashCode());
+        }
+
         @RepeatedTest(3)
         void noneIsSingleton() {
             assertSame(Option.none(), Option.none());
@@ -110,6 +115,12 @@ class ControlTypesTest {
             assertThrows(NullPointerException.class, () -> Either.left(null));
             assertThrows(NullPointerException.class, () -> Either.right(null));
             assertThrows(NullPointerException.class, () -> right.flatMap(value -> null));
+        }
+
+        @Test
+        void eitherHashCodesAreNonZero() {
+            assertNotEquals(0, Either.left("x").hashCode());
+            assertNotEquals(0, Either.right(1).hashCode());
         }
     }
 
@@ -190,6 +201,12 @@ class ControlTypesTest {
             assertThrows(NullPointerException.class, () -> success.flatMap(value -> null));
             assertTrue(Try.of(() -> null).isFailure());
         }
+
+        @Test
+        void tryHashCodesAreNonZero() {
+            assertNotEquals(0, Try.success(1).hashCode());
+            assertNotEquals(0, Try.failure(new IOException("boom")).hashCode());
+        }
     }
 
     @Nested
@@ -234,6 +251,13 @@ class ControlTypesTest {
             assertThrows(NullPointerException.class, () -> Ior.right(null));
             assertThrows(NullPointerException.class, () -> Ior.both(null, 1));
             assertThrows(NullPointerException.class, () -> Ior.both("x", null));
+        }
+
+        @Test
+        void iorHashCodesAreNonZero() {
+            assertNotEquals(0, Ior.left("x").hashCode());
+            assertNotEquals(0, Ior.right(1).hashCode());
+            assertNotEquals(0, Ior.both("x", 1).hashCode());
         }
     }
 

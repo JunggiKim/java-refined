@@ -3,8 +3,8 @@ package io.github.junggikim.refined.predicate;
 import static io.github.junggikim.refined.support.TestCollections.listOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import io.github.junggikim.refined.core.Constraint;
+import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.predicate.collection.MaxSize;
 import io.github.junggikim.refined.predicate.collection.MinSize;
 import io.github.junggikim.refined.predicate.collection.SizeBetween;
@@ -146,5 +146,38 @@ class PredicateTypesTest {
             DynamicTest.dynamicTest(displayName + " rejects invalid values", () -> assertEquals(code, predicate.validate(invalid).getError().code())),
             DynamicTest.dynamicTest(displayName + " rejects null", () -> assertEquals(code, predicate.validate(null).getError().code()))
         );
+    }
+
+    @Test
+    void sizeBetweenAcceptsExactBoundaryValues() {
+        Constraint<List<Integer>> c = new SizeBetween<>(2, 4);
+        assertEquals(listOf(1, 2), c.validate(listOf(1, 2)).get());
+        assertEquals(listOf(1, 2, 3, 4), c.validate(listOf(1, 2, 3, 4)).get());
+        assertEquals("size-between", c.validate(listOf(1)).getError().code());
+        assertEquals("size-between", c.validate(listOf(1, 2, 3, 4, 5)).getError().code());
+    }
+
+    @Test
+    void lengthBetweenAcceptsExactBoundaryValues() {
+        Constraint<String> c = new LengthBetween(2, 4);
+        assertEquals("ab", c.validate("ab").get());
+        assertEquals("abcd", c.validate("abcd").get());
+        assertEquals("length-between", c.validate("a").getError().code());
+        assertEquals("length-between", c.validate("abcde").getError().code());
+    }
+
+    @Test
+    void anyOfRejectsNullEvenWhenConstraintAcceptsEverything() {
+        Constraint<String> acceptAll = new Constraint<String>() {
+            @Override
+            public Validation<io.github.junggikim.refined.violation.Violation, String> validate(String value) {
+                if (value == null) {
+                    return Validation.invalid(io.github.junggikim.refined.violation.Violation.of("null", "null"));
+                }
+                return Validation.valid(value);
+            }
+        };
+        AnyOf<String> anyOf = new AnyOf<>(listOf(acceptAll));
+        assertEquals("any-of", anyOf.validate(null).getError().code());
     }
 }

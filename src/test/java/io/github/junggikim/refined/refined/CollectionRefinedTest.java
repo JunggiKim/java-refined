@@ -114,6 +114,16 @@ class CollectionRefinedTest {
     }
 
     @Test
+    void nonEmptySetAndMapReportAbsenceOfMissingElements() {
+        Set<Integer> set = NonEmptySet.unsafeOf(new LinkedHashSet<Integer>(listOf(1, 2)));
+        Map<String, Integer> map = NonEmptyMap.unsafeOf(new LinkedHashMap<String, Integer>(mapOf("a", 1)));
+
+        assertFalse(set.contains(99));
+        assertFalse(map.containsKey("missing"));
+        assertFalse(map.containsValue(99));
+    }
+
+    @Test
     void supportUtilityNonEmptyCollectionCoversCustomMessage() {
         assertEquals(listOf(1), RefinedSupport.nonEmptyCollection("collection", "collection must not be empty")
             .validate(listOf(1))

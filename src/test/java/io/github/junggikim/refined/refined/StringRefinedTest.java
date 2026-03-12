@@ -2,6 +2,7 @@ package io.github.junggikim.refined.refined;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.github.junggikim.refined.core.RefinementException;
@@ -77,5 +78,10 @@ class StringRefinedTest {
 
     private static String uuidLike() {
         return "123e4567-e89b-12d3-a456-426614174000";
+    }
+
+    @Test
+    void differentRefinedTypesWithSameValueAreNotEqual() {
+        assertNotEquals(NonBlankString.unsafeOf("hello"), NonEmptyString.unsafeOf("hello"));
     }
 }

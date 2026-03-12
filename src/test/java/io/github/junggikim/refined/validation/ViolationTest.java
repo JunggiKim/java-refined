@@ -51,4 +51,9 @@ class ViolationTest {
         assertThrows(NullPointerException.class, () -> assertEquals("code", violation.withMetadata(null, "v").code()));
         assertThrows(NullPointerException.class, () -> assertEquals("code", violation.withMetadata("k2", null).code()));
     }
+
+    @Test
+    void violationHashCodeIsNonZero() {
+        assertNotEquals(0, new Violation("code", "message", mapOf("k", "v")).hashCode());
+    }
 }

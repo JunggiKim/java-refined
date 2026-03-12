@@ -5,6 +5,7 @@ import static io.github.junggikim.refined.support.TestCollections.mapOf;
 import static io.github.junggikim.refined.support.TestCollections.snapshot;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -25,6 +26,8 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import org.junit.jupiter.api.Test;
 
 class RefinedSupportTest {
@@ -172,6 +175,154 @@ class RefinedSupportTest {
         assertEquals("non-empty-sorted-map-null-value", RefinedSupport.nonEmptySortedMapSnapshot(nullValueSortedMap()).getError().code());
         assertEquals("non-empty-navigable-map-null-key", RefinedSupport.nonEmptyNavigableMapSnapshot(nullKeyNavigableMap()).getError().code());
         assertEquals("non-empty-navigable-map-null-value", RefinedSupport.nonEmptyNavigableMapSnapshot(nullValueNavigableMap()).getError().code());
+    }
+
+    @Test
+    void stringConstraintFactoriesReturnFunctionalConstraints() {
+        assertTrue(RefinedSupport.nonEmptyString().validate("a").isValid());
+        assertTrue(RefinedSupport.nonBlankString().validate("a").isValid());
+        assertTrue(RefinedSupport.trimmedString().validate("a").isValid());
+        assertTrue(RefinedSupport.emailString().validate("a@b.com").isValid());
+        assertTrue(RefinedSupport.asciiString().validate("abc").isValid());
+        assertTrue(RefinedSupport.alphabeticString().validate("abc").isValid());
+        assertTrue(RefinedSupport.numericString().validate("123").isValid());
+        assertTrue(RefinedSupport.alphanumericString().validate("abc123").isValid());
+        assertTrue(RefinedSupport.slugString().validate("my-slug").isValid());
+        assertTrue(RefinedSupport.lowerCaseString().validate("abc").isValid());
+        assertTrue(RefinedSupport.upperCaseString().validate("ABC").isValid());
+        assertTrue(RefinedSupport.uuidString().validate("550e8400-e29b-41d4-a716-446655440000").isValid());
+        assertTrue(RefinedSupport.uriString().validate("https://example.com").isValid());
+        assertTrue(RefinedSupport.urlString().validate("https://example.com").isValid());
+        assertTrue(RefinedSupport.ipv4String().validate("127.0.0.1").isValid());
+        assertTrue(RefinedSupport.hostnameString().validate("example.com").isValid());
+        assertTrue(RefinedSupport.jsonString().validate("{}").isValid());
+        assertTrue(RefinedSupport.base64String().validate("aGVsbG8=").isValid());
+        assertTrue(RefinedSupport.base64UrlString().validate("aGVsbG8").isValid());
+        assertTrue(RefinedSupport.hexColorString().validate("#FF0000").isValid());
+        assertTrue(RefinedSupport.macAddressString().validate("00:11:22:33:44:55").isValid());
+        assertTrue(RefinedSupport.semVerString().validate("1.0.0").isValid());
+        assertTrue(RefinedSupport.iso8601DateString().validate("2026-01-01").isValid());
+        assertTrue(RefinedSupport.iso8601TimeString().validate("12:00:00").isValid());
+        assertTrue(RefinedSupport.iso8601DateTimeString().validate("2026-01-01T12:00:00Z").isValid());
+        assertTrue(RefinedSupport.iso8601DurationString().validate("PT1H").isValid());
+        assertTrue(RefinedSupport.iso8601PeriodString().validate("P1Y").isValid());
+        assertTrue(RefinedSupport.creditCardString().validate("4111111111111111").isValid());
+        assertTrue(RefinedSupport.isbnString().validate("9783161484100").isValid());
+        assertTrue(RefinedSupport.jwtString().validate("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.abc").isValid());
+        assertTrue(RefinedSupport.cidrV4String().validate("192.168.0.0/24").isValid());
+        assertTrue(RefinedSupport.cidrV6String().validate("::1/128").isValid());
+        assertTrue(RefinedSupport.regexString().validate("[a-z]+").isValid());
+        assertTrue(RefinedSupport.timeZoneIdString().validate("UTC").isValid());
+        assertTrue(RefinedSupport.ulidString().validate("01ARZ3NDEKTSV4RRFFQ69G5FAV").isValid());
+        assertTrue(RefinedSupport.xpathString().validate("/root/child").isValid());
+        assertTrue(RefinedSupport.validIntString().validate("42").isValid());
+        assertTrue(RefinedSupport.validLongString().validate("42").isValid());
+        assertTrue(RefinedSupport.validShortString().validate("42").isValid());
+        assertTrue(RefinedSupport.validByteString().validate("42").isValid());
+        assertTrue(RefinedSupport.validDoubleString().validate("3.14").isValid());
+        assertTrue(RefinedSupport.validFloatString().validate("3.14").isValid());
+        assertTrue(RefinedSupport.validBigDecimalString().validate("3.14").isValid());
+        assertTrue(RefinedSupport.validBigIntegerString().validate("42").isValid());
+    }
+
+    @Test
+    void numericConstraintFactoriesReturnFunctionalConstraints() {
+        assertTrue(RefinedSupport.positiveInt().validate(1).isValid());
+        assertTrue(RefinedSupport.nonNegativeInt().validate(0).isValid());
+        assertTrue(RefinedSupport.negativeInt().validate(-1).isValid());
+        assertTrue(RefinedSupport.nonPositiveInt().validate(0).isValid());
+        assertTrue(RefinedSupport.naturalInt().validate(1).isValid());
+        assertTrue(RefinedSupport.nonZeroInt().validate(1).isValid());
+        assertTrue(RefinedSupport.evenInt().validate(2).isValid());
+        assertTrue(RefinedSupport.oddInt().validate(1).isValid());
+        assertTrue(RefinedSupport.positiveLong().validate(1L).isValid());
+        assertTrue(RefinedSupport.nonNegativeLong().validate(0L).isValid());
+        assertTrue(RefinedSupport.negativeLong().validate(-1L).isValid());
+        assertTrue(RefinedSupport.nonPositiveLong().validate(0L).isValid());
+        assertTrue(RefinedSupport.naturalLong().validate(1L).isValid());
+        assertTrue(RefinedSupport.nonZeroLong().validate(1L).isValid());
+        assertTrue(RefinedSupport.evenLong().validate(2L).isValid());
+        assertTrue(RefinedSupport.oddLong().validate(1L).isValid());
+        assertTrue(RefinedSupport.positiveShort().validate((short) 1).isValid());
+        assertTrue(RefinedSupport.nonNegativeShort().validate((short) 0).isValid());
+        assertTrue(RefinedSupport.negativeShort().validate((short) -1).isValid());
+        assertTrue(RefinedSupport.nonPositiveShort().validate((short) 0).isValid());
+        assertTrue(RefinedSupport.naturalShort().validate((short) 1).isValid());
+        assertTrue(RefinedSupport.nonZeroShort().validate((short) 1).isValid());
+        assertTrue(RefinedSupport.positiveByte().validate((byte) 1).isValid());
+        assertTrue(RefinedSupport.nonNegativeByte().validate((byte) 0).isValid());
+        assertTrue(RefinedSupport.negativeByte().validate((byte) -1).isValid());
+        assertTrue(RefinedSupport.nonPositiveByte().validate((byte) 0).isValid());
+        assertTrue(RefinedSupport.naturalByte().validate((byte) 1).isValid());
+        assertTrue(RefinedSupport.nonZeroByte().validate((byte) 1).isValid());
+        assertTrue(RefinedSupport.positiveDouble().validate(1.0).isValid());
+        assertTrue(RefinedSupport.nonNegativeDouble().validate(0.0).isValid());
+        assertTrue(RefinedSupport.negativeDouble().validate(-1.0).isValid());
+        assertTrue(RefinedSupport.nonPositiveDouble().validate(0.0).isValid());
+        assertTrue(RefinedSupport.nonZeroDouble().validate(1.0).isValid());
+        assertTrue(RefinedSupport.zeroToOneDouble().validate(0.5).isValid());
+        assertTrue(RefinedSupport.positiveFloat().validate(1.0f).isValid());
+        assertTrue(RefinedSupport.nonNegativeFloat().validate(0.0f).isValid());
+        assertTrue(RefinedSupport.negativeFloat().validate(-1.0f).isValid());
+        assertTrue(RefinedSupport.nonPositiveFloat().validate(0.0f).isValid());
+        assertTrue(RefinedSupport.nonZeroFloat().validate(1.0f).isValid());
+        assertTrue(RefinedSupport.zeroToOneFloat().validate(0.5f).isValid());
+        assertTrue(RefinedSupport.positiveBigDecimal().validate(BigDecimal.ONE).isValid());
+        assertTrue(RefinedSupport.nonNegativeBigDecimal().validate(BigDecimal.ZERO).isValid());
+        assertTrue(RefinedSupport.negativeBigDecimal().validate(BigDecimal.ONE.negate()).isValid());
+        assertTrue(RefinedSupport.nonPositiveBigDecimal().validate(BigDecimal.ZERO).isValid());
+        assertTrue(RefinedSupport.nonZeroBigDecimal().validate(BigDecimal.ONE).isValid());
+        assertTrue(RefinedSupport.positiveBigInteger().validate(BigInteger.ONE).isValid());
+        assertTrue(RefinedSupport.nonNegativeBigInteger().validate(BigInteger.ZERO).isValid());
+        assertTrue(RefinedSupport.negativeBigInteger().validate(BigInteger.ONE.negate()).isValid());
+        assertTrue(RefinedSupport.nonPositiveBigInteger().validate(BigInteger.ZERO).isValid());
+        assertTrue(RefinedSupport.naturalBigInteger().validate(BigInteger.ONE).isValid());
+        assertTrue(RefinedSupport.nonZeroBigInteger().validate(BigInteger.ONE).isValid());
+        assertTrue(RefinedSupport.evenBigInteger().validate(BigInteger.valueOf(2)).isValid());
+        assertTrue(RefinedSupport.oddBigInteger().validate(BigInteger.ONE).isValid());
+        assertTrue(RefinedSupport.finiteDouble().validate(1.0).isValid());
+        assertTrue(RefinedSupport.finiteFloat().validate(1.0f).isValid());
+        assertTrue(RefinedSupport.nonNaNDouble().validate(1.0).isValid());
+        assertTrue(RefinedSupport.nonNaNFloat().validate(1.0f).isValid());
+    }
+
+    @Test
+    void characterAndBooleanConstraintFactoriesReturnFunctionalConstraints() {
+        assertTrue(RefinedSupport.digitChar().validate('1').isValid());
+        assertTrue(RefinedSupport.letterChar().validate('a').isValid());
+        assertTrue(RefinedSupport.letterOrDigitChar().validate('a').isValid());
+        assertTrue(RefinedSupport.lowerCaseChar().validate('a').isValid());
+        assertTrue(RefinedSupport.upperCaseChar().validate('A').isValid());
+        assertTrue(RefinedSupport.whitespaceChar().validate(' ').isValid());
+        assertTrue(RefinedSupport.specialChar().validate('!').isValid());
+        assertTrue(RefinedSupport.trueValue().validate(true).isValid());
+        assertTrue(RefinedSupport.falseValue().validate(false).isValid());
+        assertTrue(RefinedSupport.andBooleanList().validate(listOf(true, true)).isValid());
+        assertTrue(RefinedSupport.orBooleanList().validate(listOf(false, true)).isValid());
+        assertTrue(RefinedSupport.nandBooleanList().validate(listOf(false, true)).isValid());
+        assertTrue(RefinedSupport.norBooleanList().validate(listOf(false, false)).isValid());
+        assertTrue(RefinedSupport.xorBooleanList().validate(listOf(true, false)).isValid());
+        assertTrue(RefinedSupport.oneOfBooleanList().validate(listOf(true, false, false)).isValid());
+    }
+
+    @Test
+    void parameterizedConstraintFactoriesReturnFunctionalConstraints() {
+        assertTrue(RefinedSupport.greaterOrEqual(0, "c", "m").validate(1).isValid());
+        assertTrue(RefinedSupport.lessThan(10, "c", "m").validate(5).isValid());
+        assertTrue(RefinedSupport.lessOrEqual(10, "c", "m").validate(10).isValid());
+        assertTrue(RefinedSupport.nonZero(0, "c", "m").validate(1).isValid());
+    }
+
+    @Test
+    void stringConstraintsRejectEmptyStringWhenRequired() {
+        assertEquals("alphabetic-string", RefinedSupport.alphabeticString().validate("").getError().code());
+        assertEquals("alphanumeric-string", RefinedSupport.alphanumericString().validate("").getError().code());
+    }
+
+    @Test
+    void xmlStringRejectsDoctypeDeclarations() {
+        String xmlWithDoctype = "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY xxe \"xxe\">]><root>&xxe;</root>";
+        assertEquals("xml-string", RefinedSupport.xmlString().validate(xmlWithDoctype).getError().code());
     }
 
     private static Iterable<Integer> iterableOf(Integer... values) {

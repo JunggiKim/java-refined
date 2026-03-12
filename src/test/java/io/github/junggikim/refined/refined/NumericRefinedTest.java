@@ -2,6 +2,7 @@ package io.github.junggikim.refined.refined;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -133,5 +134,10 @@ class NumericRefinedTest {
         assertTrue(!positive.equals(null));
         assertTrue(!positive.equals(NonNegativeInt.unsafeOf(1)));
         assertInstanceOf(Integer.class, positive.value());
+    }
+
+    @Test
+    void refinedTypeHashCodeIsNonZero() {
+        assertNotEquals(0, PositiveInt.unsafeOf(1).hashCode());
     }
 }

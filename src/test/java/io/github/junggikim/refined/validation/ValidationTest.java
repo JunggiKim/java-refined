@@ -78,4 +78,10 @@ class ValidationTest {
         assertEquals("Invalid[error=" + error + "]", invalid.toString());
         assertThrows(NullPointerException.class, () -> Validation.invalid(null));
     }
+
+    @Test
+    void validationHashCodesAreNonZero() {
+        assertNotEquals(0, Validation.valid(3).hashCode());
+        assertNotEquals(0, Validation.invalid(Violation.of("code", "msg")).hashCode());
+    }
 }

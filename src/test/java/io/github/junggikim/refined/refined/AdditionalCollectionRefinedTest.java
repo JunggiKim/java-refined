@@ -5,6 +5,7 @@ import static io.github.junggikim.refined.support.TestCollections.mapOf;
 import static io.github.junggikim.refined.support.TestCollections.snapshot;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.github.junggikim.refined.core.RefinementException;
@@ -240,5 +241,20 @@ class AdditionalCollectionRefinedTest {
 
         assertEquals("non-empty-queue-null-element", NonEmptyQueue.of(dequeWithNull).getError().code());
         assertEquals("non-empty-deque-null-element", io.github.junggikim.refined.refined.collection.NonEmptyDeque.of(dequeWithNull).getError().code());
+    }
+
+    @Test
+    void sortedAndNavigableCollectionsReportAbsenceOfMissingElements() {
+        SortedMap<Integer, String> sortedMap = NonEmptySortedMap.unsafeOf(new TreeMap<Integer, String>(mapOf(1, "one")));
+        NavigableMap<Integer, String> navMap = NonEmptyNavigableMap.unsafeOf(new TreeMap<Integer, String>(mapOf(1, "one")));
+        SortedSet<Integer> sortedSet = NonEmptySortedSet.unsafeOf(new TreeSet<Integer>(listOf(1, 2)));
+        NavigableSet<Integer> navSet = NonEmptyNavigableSet.unsafeOf(new TreeSet<Integer>(listOf(1, 2)));
+
+        assertFalse(sortedMap.containsKey(99));
+        assertFalse(sortedMap.containsValue("missing"));
+        assertFalse(navMap.containsKey(99));
+        assertFalse(navMap.containsValue("missing"));
+        assertFalse(sortedSet.contains(99));
+        assertFalse(navSet.contains(99));
     }
 }
