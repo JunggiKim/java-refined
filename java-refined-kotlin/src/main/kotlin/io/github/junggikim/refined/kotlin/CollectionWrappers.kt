@@ -19,6 +19,18 @@ import kotlin.jvm.JvmName
 class KNonEmptyList<T> internal constructor(
     private val delegate: NonEmptyList<T>
 ) : List<T> by delegate {
+    @Deprecated("Read-only view", level = DeprecationLevel.ERROR)
+    fun addFirst(value: T): Nothing = throw UnsupportedOperationException("Read-only view")
+
+    @Deprecated("Read-only view", level = DeprecationLevel.ERROR)
+    fun addLast(value: T): Nothing = throw UnsupportedOperationException("Read-only view")
+
+    @Deprecated("Read-only view", level = DeprecationLevel.ERROR)
+    fun removeFirst(): Nothing = throw UnsupportedOperationException("Read-only view")
+
+    @Deprecated("Read-only view", level = DeprecationLevel.ERROR)
+    fun removeLast(): Nothing = throw UnsupportedOperationException("Read-only view")
+
     val head: T
         get() = delegate.head()
 
@@ -43,6 +55,18 @@ class KNonEmptyMap<K, V> internal constructor(
 class KNonEmptyIterable<T> internal constructor(
     private val delegate: NonEmptyIterable<T>
 ) : List<T> by delegate {
+    @Deprecated("Read-only view", level = DeprecationLevel.ERROR)
+    fun addFirst(value: T): Nothing = throw UnsupportedOperationException("Read-only view")
+
+    @Deprecated("Read-only view", level = DeprecationLevel.ERROR)
+    fun addLast(value: T): Nothing = throw UnsupportedOperationException("Read-only view")
+
+    @Deprecated("Read-only view", level = DeprecationLevel.ERROR)
+    fun removeFirst(): Nothing = throw UnsupportedOperationException("Read-only view")
+
+    @Deprecated("Read-only view", level = DeprecationLevel.ERROR)
+    fun removeLast(): Nothing = throw UnsupportedOperationException("Read-only view")
+
     val head: T
         get() = delegate.head()
 
@@ -55,6 +79,18 @@ class KNonEmptyIterable<T> internal constructor(
 class KNonEmptyQueue<T> internal constructor(
     private val delegate: NonEmptyQueue<T>
 ) : List<T> by delegate {
+    @Deprecated("Read-only view", level = DeprecationLevel.ERROR)
+    fun addFirst(value: T): Nothing = throw UnsupportedOperationException("Read-only view")
+
+    @Deprecated("Read-only view", level = DeprecationLevel.ERROR)
+    fun addLast(value: T): Nothing = throw UnsupportedOperationException("Read-only view")
+
+    @Deprecated("Read-only view", level = DeprecationLevel.ERROR)
+    fun removeFirst(): Nothing = throw UnsupportedOperationException("Read-only view")
+
+    @Deprecated("Read-only view", level = DeprecationLevel.ERROR)
+    fun removeLast(): Nothing = throw UnsupportedOperationException("Read-only view")
+
     fun peek(): T = delegate.peek()
 
     fun element(): T = delegate.element()
@@ -69,6 +105,18 @@ class KNonEmptyQueue<T> internal constructor(
 class KNonEmptyDeque<T> internal constructor(
     private val delegate: NonEmptyDeque<T>
 ) : List<T> by delegate {
+    @Deprecated("Read-only view", level = DeprecationLevel.ERROR)
+    fun addFirst(value: T): Nothing = throw UnsupportedOperationException("Read-only view")
+
+    @Deprecated("Read-only view", level = DeprecationLevel.ERROR)
+    fun addLast(value: T): Nothing = throw UnsupportedOperationException("Read-only view")
+
+    @Deprecated("Read-only view", level = DeprecationLevel.ERROR)
+    fun removeFirst(): Nothing = throw UnsupportedOperationException("Read-only view")
+
+    @Deprecated("Read-only view", level = DeprecationLevel.ERROR)
+    fun removeLast(): Nothing = throw UnsupportedOperationException("Read-only view")
+
     @get:JvmName("firstValue")
     val first: T
         get() = delegate.first()

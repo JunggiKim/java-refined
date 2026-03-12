@@ -92,7 +92,10 @@ class KotlinCompileSurfaceTest {
     private fun assertCompilationError(source: String) {
         val result = compile(source)
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode, result.messages)
-        assertTrue(result.messages.contains("Unresolved reference"), result.messages)
+        assertTrue(
+            result.messages.contains("Unresolved reference") || result.messages.contains("Read-only view"),
+            result.messages
+        )
     }
 
     private fun compile(source: String): KotlinCompilation.Result =
