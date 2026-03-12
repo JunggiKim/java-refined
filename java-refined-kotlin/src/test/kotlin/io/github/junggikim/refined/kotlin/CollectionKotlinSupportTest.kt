@@ -24,6 +24,35 @@ import org.junit.jupiter.api.Test
 
 class CollectionKotlinSupportTest {
 
+    @Suppress("DEPRECATION_ERROR")
+    @Test
+    fun suppressedSequencedListMutatorsStillThrowAtRuntime() {
+        val list = listOf(1, 2).toNonEmptyListOrThrow()
+        val iterable = listOf(3, 4).asIterable().toNonEmptyIterableOrThrow()
+        val queue = ArrayDeque(listOf(5, 6)).toNonEmptyQueueOrThrow()
+        val deque = ArrayDeque(listOf(7, 8)).toNonEmptyDequeOrThrow()
+
+        assertFailsWith<UnsupportedOperationException> { list.addFirst(0) }
+        assertFailsWith<UnsupportedOperationException> { list.addLast(3) }
+        assertFailsWith<UnsupportedOperationException> { list.removeFirst() }
+        assertFailsWith<UnsupportedOperationException> { list.removeLast() }
+
+        assertFailsWith<UnsupportedOperationException> { iterable.addFirst(2) }
+        assertFailsWith<UnsupportedOperationException> { iterable.addLast(5) }
+        assertFailsWith<UnsupportedOperationException> { iterable.removeFirst() }
+        assertFailsWith<UnsupportedOperationException> { iterable.removeLast() }
+
+        assertFailsWith<UnsupportedOperationException> { queue.addFirst(4) }
+        assertFailsWith<UnsupportedOperationException> { queue.addLast(7) }
+        assertFailsWith<UnsupportedOperationException> { queue.removeFirst() }
+        assertFailsWith<UnsupportedOperationException> { queue.removeLast() }
+
+        assertFailsWith<UnsupportedOperationException> { deque.addFirst(6) }
+        assertFailsWith<UnsupportedOperationException> { deque.addLast(9) }
+        assertFailsWith<UnsupportedOperationException> { deque.removeFirst() }
+        assertFailsWith<UnsupportedOperationException> { deque.removeLast() }
+    }
+
     @Test
     fun validationExtensionsAndBeanPropertyBridgesWork() {
         val valid = "Ada".toNonBlankString()
