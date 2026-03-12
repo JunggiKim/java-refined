@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Error-accumulating validation result used when multiple failures should be preserved.
@@ -23,7 +24,8 @@ public interface Validated<E, A> {
      * @param <A> success type
      * @return valid result
      */
-    static <E, A> Validated<E, A> valid(A value) {
+    @NotNull
+    static <E, A> Validated<E, A> valid(@NotNull A value) {
         return new Valid<>(value);
     }
 
@@ -35,7 +37,8 @@ public interface Validated<E, A> {
      * @param <A> success type
      * @return invalid result
      */
-    static <E, A> Validated<E, A> invalid(List<E> errors) {
+    @NotNull
+    static <E, A> Validated<E, A> invalid(@NotNull List<E> errors) {
         return new Invalid<>(errors);
     }
 
@@ -62,7 +65,8 @@ public interface Validated<E, A> {
      * @param <B> mapped success type
      * @return mapped valid result or the original invalid result
      */
-    <B> Validated<E, B> map(Function<? super A, ? extends B> mapper);
+    @NotNull
+    <B> Validated<E, B> map(@NotNull Function<? super A, ? extends B> mapper);
 
     /**
      * Zips two validated results and accumulates both error lists when both sides fail.
@@ -73,7 +77,8 @@ public interface Validated<E, A> {
      * @param <C> combined success type
      * @return combined validated result
      */
-    default <B, C> Validated<E, C> zip(Validated<E, B> other, BiFunction<? super A, ? super B, ? extends C> mapper) {
+    @NotNull
+    default <B, C> Validated<E, C> zip(@NotNull Validated<E, B> other, @NotNull BiFunction<? super A, ? super B, ? extends C> mapper) {
         if (isValid() && other.isValid()) {
             return valid(mapper.apply(get(), other.get()));
         }
@@ -88,6 +93,7 @@ public interface Validated<E, A> {
      *
      * @return validated value
      */
+    @NotNull
     A get();
 
     /**
@@ -95,6 +101,7 @@ public interface Validated<E, A> {
      *
      * @return immutable error list
      */
+    @NotNull
     List<E> getErrors();
 
     /**
@@ -105,7 +112,8 @@ public interface Validated<E, A> {
      * @param <E> error element type
      * @return merged immutable list
      */
-    static <E> List<E> merge(List<E> left, List<E> right) {
+    @NotNull
+    static <E> List<E> merge(@NotNull List<E> left, @NotNull List<E> right) {
         ArrayList<E> merged = new ArrayList<E>(left.size() + right.size());
         merged.addAll(left);
         merged.addAll(right);
@@ -115,7 +123,7 @@ public interface Validated<E, A> {
     final class Valid<E, A> implements Validated<E, A> {
         private final A value;
 
-        public Valid(A value) {
+        public Valid(@NotNull A value) {
             this.value = Objects.requireNonNull(value, "value");
         }
 
@@ -125,16 +133,19 @@ public interface Validated<E, A> {
         }
 
         @Override
-        public <B> Validated<E, B> map(Function<? super A, ? extends B> mapper) {
+        @NotNull
+        public <B> Validated<E, B> map(@NotNull Function<? super A, ? extends B> mapper) {
             return valid(mapper.apply(value));
         }
 
         @Override
+        @NotNull
         public A get() {
             return value;
         }
 
         @Override
+        @NotNull
         public List<E> getErrors() {
             throw new IllegalStateException("Valid does not contain errors");
         }
@@ -157,6 +168,7 @@ public interface Validated<E, A> {
         }
 
         @Override
+        @NotNull
         public String toString() {
             return "Valid[value=" + value + "]";
         }
@@ -165,7 +177,7 @@ public interface Validated<E, A> {
     final class Invalid<E, A> implements Validated<E, A> {
         private final List<E> errors;
 
-        public Invalid(List<E> errors) {
+        public Invalid(@NotNull List<E> errors) {
             Objects.requireNonNull(errors, "errors");
             this.errors = copyErrors(errors);
             if (this.errors.isEmpty()) {
@@ -179,16 +191,19 @@ public interface Validated<E, A> {
         }
 
         @Override
-        public <B> Validated<E, B> map(Function<? super A, ? extends B> mapper) {
+        @NotNull
+        public <B> Validated<E, B> map(@NotNull Function<? super A, ? extends B> mapper) {
             return invalid(errors);
         }
 
         @Override
+        @NotNull
         public A get() {
             throw new IllegalStateException("Invalid does not contain a value");
         }
 
         @Override
+        @NotNull
         public List<E> getErrors() {
             return Collections.unmodifiableList(new ArrayList<E>(errors));
         }
@@ -211,6 +226,7 @@ public interface Validated<E, A> {
         }
 
         @Override
+        @NotNull
         public String toString() {
             return "Invalid[errors=" + errors + "]";
         }
@@ -223,7 +239,8 @@ public interface Validated<E, A> {
      * @param <E> error element type
      * @return immutable copied list
      */
-    static <E> List<E> copyErrors(List<E> errors) {
+    @NotNull
+    static <E> List<E> copyErrors(@NotNull List<E> errors) {
         ArrayList<E> copy = new ArrayList<E>(errors.size());
         for (E error : errors) {
             copy.add(Objects.requireNonNull(error, "error"));

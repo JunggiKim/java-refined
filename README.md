@@ -4,7 +4,9 @@
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Java Refined is a Java 8+ library for refinement types, non-empty collections,
-and small functional control types without runtime dependencies.
+and small functional control types. The core `java-refined` artifact has no
+runtime dependencies, and the optional `java-refined-kotlin` artifact adds a
+single Kotlin runtime dependency on `kotlin-stdlib`.
 
 It lets you move validation out of scattered `if` checks and into explicit
 types such as `PositiveInt`, `NonBlankString`, and `NonEmptyList`.
@@ -12,9 +14,15 @@ types such as `PositiveInt`, `NonBlankString`, and `NonEmptyList`.
 This project is open source under the MIT license, so you can use, modify, and
 distribute it in personal or commercial codebases.
 
+Java-only projects can use `java-refined` with no runtime dependencies.
+Kotlin/JVM projects can optionally add `java-refined-kotlin` for Kotlin-first
+extensions and collection adapters, which adds a single runtime dependency on
+`org.jetbrains.kotlin:kotlin-stdlib`.
+
 ## Features
 
-- zero runtime dependencies
+- zero runtime dependencies in the core `java-refined` module
+- optional Kotlin/JVM support module with Kotlin-first extensions and one `kotlin-stdlib` runtime dependency
 - Java 8 bytecode baseline with Java 8+ APIs
 - refined wrappers with safe `of` and throwing `unsafeOf` constructors
 - fail-fast `Validation` and error-accumulating `Validated`
@@ -29,6 +37,7 @@ distribute it in personal or commercial codebases.
 - [Installation](#installation)
 - [Coordinates](#coordinates)
 - [Basic Usage](#basic-usage)
+- [Kotlin/JVM Usage](#kotlinjvm-usage)
 - [Error Handling](#error-handling)
 - [Core Concepts](#core-concepts)
 - [Core API](#core-api)
@@ -63,19 +72,45 @@ object with `isValid()`, `get()`, `getError()`, or `fold(...)`.
 This library is currently distributed via source checkout and local Maven builds only.
 From a source checkout, run `./gradlew publishToMavenLocal` and resolve the dependency through the local Maven repository.
 
+### Java Only
+
+Use only the core `java-refined` artifact when your codebase is Java-only.
+
 Local install checklist:
 
 1. Run `./gradlew publishToMavenLocal`.
 2. Add `mavenLocal()` to your repositories.
-3. Add the dependency coordinates shown below.
+3. Add `io.github.junggikim:java-refined:1.1.0`.
+
+The core module has no extra runtime dependencies beyond the JDK modules it already uses.
+
+### Kotlin/JVM
+
+Add the optional `java-refined-kotlin` module only when you want Kotlin-first
+extensions and collection adapters on top of the Java core API.
+
+Local install checklist:
+
+1. Run `./gradlew publishToMavenLocal`.
+2. Add `mavenLocal()` and `mavenCentral()` to your repositories.
+3. Add both `java-refined` and `java-refined-kotlin`.
+
+The Kotlin support module adds one runtime dependency: `org.jetbrains.kotlin:kotlin-stdlib`.
 
 ## Coordinates
 
 ```text
-io.github.junggikim:java-refined
+Java only:
+io.github.junggikim:java-refined:1.1.0
+
+Kotlin/JVM:
+io.github.junggikim:java-refined:1.1.0
+io.github.junggikim:java-refined-kotlin:1.1.0
 ```
 
 ### Gradle Kotlin DSL
+
+Java only:
 
 ```kotlin
 repositories {
@@ -83,11 +118,27 @@ repositories {
 }
 
 dependencies {
-    implementation("io.github.junggikim:java-refined:1.0.0")
+    implementation("io.github.junggikim:java-refined:1.1.0")
+}
+```
+
+Kotlin/JVM:
+
+```kotlin
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation("io.github.junggikim:java-refined:1.1.0")
+    implementation("io.github.junggikim:java-refined-kotlin:1.1.0")
 }
 ```
 
 ### Gradle Groovy DSL
+
+Java only:
 
 ```groovy
 repositories {
@@ -95,21 +146,53 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.github.junggikim:java-refined:1.0.0'
+    implementation 'io.github.junggikim:java-refined:1.1.0'
+}
+```
+
+Kotlin/JVM:
+
+```groovy
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.github.junggikim:java-refined:1.1.0'
+    implementation 'io.github.junggikim:java-refined-kotlin:1.1.0'
 }
 ```
 
 ### Maven
 
+Java only:
+
 ```xml
 <dependency>
   <groupId>io.github.junggikim</groupId>
   <artifactId>java-refined</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
 </dependency>
 ```
 
-Ensure the artifact has been published to the local Maven repository before resolving it from Maven.
+Kotlin/JVM:
+
+```xml
+<dependency>
+  <groupId>io.github.junggikim</groupId>
+  <artifactId>java-refined</artifactId>
+  <version>1.1.0</version>
+</dependency>
+<dependency>
+  <groupId>io.github.junggikim</groupId>
+  <artifactId>java-refined-kotlin</artifactId>
+  <version>1.1.0</version>
+</dependency>
+```
+
+Ensure the artifacts have been published to the local Maven repository before resolving them.
+For Kotlin/JVM usage, keep access to Maven Central unless your build already provides `kotlin-stdlib`.
 
 ## Basic Usage
 
@@ -127,7 +210,20 @@ Validation<Violation, NonEmptyList<String>> tags = NonEmptyList.of(Arrays.asList
 
 Validation<Violation, String> summary =
     name.zip(age, (n, a) -> n.value() + " (" + a.value() + ")");
+
+boolean hasJavaTag = tags.get().contains("java");
+Validation<Violation, NonEmptyList<String>> upperTags =
+    NonEmptyList.ofStream(tags.get().stream().map(String::toUpperCase));
 ```
+
+Refined wrappers are created through factory methods, not public constructors.
+Use `of(...)` when invalid input is part of normal control flow, and use
+`unsafeOf(...)` when invalid input should fail fast.
+
+Collection refined types are direct-compatible immutable JDK collections.
+`NonEmptyList<T>` can be passed anywhere a `List<T>` is expected, and
+`NonEmptyMap<K, V>` can be passed anywhere a `Map<K, V>` is expected, without
+calling an extra unwrap method.
 
 More refined wrappers, including `NaturalInt` and `Ipv6String`:
 
@@ -143,6 +239,44 @@ String status = address.fold(
     ok -> "ip ok: " + ok.value()
 );
 ```
+
+## Kotlin/JVM Usage
+
+`java-refined-kotlin` is an optional Kotlin/JVM support module. It is not
+required for Java-only usage.
+
+It is a thin Kotlin-first layer on top of the core Java API.
+It keeps the same validation semantics while adding:
+
+- nullable receiver extensions such as `toNonBlankString()` and `toPositiveInt()`
+- `Validation` convenience helpers such as `getOrNull()`, `errorOrNull()`, and `getOrThrow()`
+- read-only Kotlin adapters for refined non-empty collections
+- `Sequence`-based factory extensions for collection refinement
+
+```kotlin
+import io.github.junggikim.refined.kotlin.errorOrNull
+import io.github.junggikim.refined.kotlin.getOrThrow
+import io.github.junggikim.refined.kotlin.toNonBlankString
+import io.github.junggikim.refined.kotlin.toNonBlankStringOrThrow
+import io.github.junggikim.refined.kotlin.toNonEmptyListOrThrow
+
+val name = "Ada".toNonBlankStringOrThrow()
+val nullableName = (null as String?).toNonBlankString()
+
+val message = nullableName.errorOrNull()!!.message
+val value: String = name.value
+
+val tags: List<String> = listOf("java", "fp").toNonEmptyListOrThrow()
+val upper = tags.map(String::uppercase)
+val refinedUpper = upper.toNonEmptyListOrThrow()
+```
+
+Kotlin collection adapters are read-only views over the Java refined collections.
+They keep the same validation rules and immutable snapshot semantics, but mutator
+methods such as `add`, `put`, `offer`, or `addFirst` are not available from Kotlin.
+
+This means Kotlin code can stay concise and idiomatic while Java code keeps using
+the same core refined wrappers and validation model.
 
 ## Error Handling
 
@@ -167,12 +301,19 @@ List<String> errors = left.zip(right, Integer::sum).getErrors();
 
 ## Core Concepts
 
-Refined wrappers expose two constructors:
+Refined wrappers expose two factory methods:
 
 - `of(value)` returns `Validation<Violation, T>` and never throws.
 - `unsafeOf(value)` throws `RefinementException` on invalid input.
 
 `Validation` is fail-fast and stops at the first error. `Validated` accumulates multiple errors into a non-empty list.
+
+For scalar wrappers such as `PositiveInt` or `NonBlankString`, the refined object
+stores the validated runtime value and exposes it through `value()`.
+
+For collection wrappers such as `NonEmptyList` or `NonEmptyMap`, the refined object
+is itself the collection interface. It preserves the non-empty invariant and immutable
+snapshot semantics while remaining directly usable as a JDK collection.
 
 ## Core API
 
@@ -183,6 +324,9 @@ Refined wrappers expose two constructors:
   - validates first
   - throws `RefinementException` on failure
   - use only at trusted boundaries after validation has already happened
+- collection wrappers additionally expose stream-based constructors
+  - `ofStream(stream)` for list/set/queue/deque/iterable/set-like wrappers
+  - `ofEntryStream(stream)` for map-like wrappers
 - `Violation`
   - stable `code`, human-readable `message`, immutable `metadata`
   - collection constructors distinguish `*-empty`, `*-null-element`, `*-null-key`, `*-null-value`, and sorted/navigable `*-invalid-*` failures
@@ -390,16 +534,16 @@ Each table lists a type and the invariant it enforces.
 
 | Type | Description |
 | --- | --- |
-| `NonEmptyList` | non-empty list with no null elements; immutable snapshot |
-| `NonEmptySet` | non-empty set with no null elements; immutable snapshot |
-| `NonEmptyMap` | non-empty map with no null keys/values; immutable snapshot |
-| `NonEmptyDeque` | non-empty deque snapshot as immutable list; no null elements |
-| `NonEmptyQueue` | non-empty queue snapshot as immutable list; no null elements |
-| `NonEmptyIterable` | non-empty iterable snapshot as immutable list; no null elements |
-| `NonEmptySortedSet` | non-empty sorted set with no null elements; immutable snapshot |
-| `NonEmptySortedMap` | non-empty sorted map with no null keys/values; immutable snapshot |
-| `NonEmptyNavigableSet` | non-empty navigable set with no null elements; immutable snapshot |
-| `NonEmptyNavigableMap` | non-empty navigable map with no null keys/values; immutable snapshot |
+| `NonEmptyList` | non-empty immutable `List` with no null elements |
+| `NonEmptySet` | non-empty immutable `Set` with no null elements |
+| `NonEmptyMap` | non-empty immutable `Map` with no null keys/values |
+| `NonEmptyDeque` | non-empty immutable `Deque` snapshot with no null elements |
+| `NonEmptyQueue` | non-empty immutable `Queue` snapshot with no null elements |
+| `NonEmptyIterable` | non-empty immutable sequence snapshot with no null elements |
+| `NonEmptySortedSet` | non-empty immutable `SortedSet` with no null elements |
+| `NonEmptySortedMap` | non-empty immutable `SortedMap` with no null keys/values |
+| `NonEmptyNavigableSet` | non-empty immutable `NavigableSet` with no null elements |
+| `NonEmptyNavigableMap` | non-empty immutable `NavigableMap` with no null keys/values |
 
 ### Control Types
 
@@ -549,7 +693,7 @@ See [docs/compatibility.md](docs/compatibility.md) for Java version caveats.
 
 ## Project Status
 
-- current local version line: `1.0.0`
+- current local version line: `1.1.0`
 - distribution: source checkout and local Maven only
 - release notes live in [CHANGELOG.md](CHANGELOG.md)
 

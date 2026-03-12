@@ -18,6 +18,8 @@ The verification pipeline covers:
 
 ## Notes
 
+- the core `java-refined` artifact has no runtime dependencies beyond the JDK modules it already uses.
+- the optional `java-refined-kotlin` artifact adds a single Kotlin runtime dependency: `org.jetbrains.kotlin:kotlin-stdlib`.
 - `testJava8` requires a JDK 8 installation that Gradle toolchains can discover.
 - The project keeps `Automatic-Module-Name` for JPMS consumers without adding `module-info.java`.
 - `NonBlankString` uses Java 8-compatible blank detection.

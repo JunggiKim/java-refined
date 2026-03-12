@@ -97,6 +97,9 @@ class NumericRefinedTest {
         class NamedConstraint implements Constraint<Integer> {
             @Override
             public Validation<Violation, Integer> validate(Integer value) {
+                if (value == null) {
+                    return Validation.invalid(Violation.of("named-constraint-null", "named-constraint-null"));
+                }
                 return Validation.valid(value);
             }
         }

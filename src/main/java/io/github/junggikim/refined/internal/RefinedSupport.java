@@ -20,8 +20,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -40,6 +42,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -187,6 +190,33 @@ public final class RefinedSupport {
         return Validation.valid(Collections.unmodifiableList(copy));
     }
 
+    private static <T> Validation<Violation, List<T>> validateLinearStreamSnapshot(
+        Stream<T> value,
+        String baseCode,
+        String containerKind
+    ) {
+        if (value == null) {
+            return Validation.invalid(emptyCollectionViolation(baseCode, containerKind));
+        }
+        ArrayList<T> copy = new ArrayList<T>();
+        try {
+            Iterator<T> iterator = value.iterator();
+            while (iterator.hasNext()) {
+                T element = iterator.next();
+                if (element == null) {
+                    return Validation.invalid(nullElementViolation(baseCode, containerKind));
+                }
+                copy.add(element);
+            }
+        } catch (RuntimeException exception) {
+            return Validation.invalid(invalidElementViolation(baseCode, containerKind));
+        }
+        if (copy.isEmpty()) {
+            return Validation.invalid(emptyCollectionViolation(baseCode, containerKind));
+        }
+        return Validation.valid(Collections.unmodifiableList(copy));
+    }
+
     private static <T> Validation<Violation, Set<T>> validateSetSnapshot(
         Collection<? extends T> value,
         String baseCode,
@@ -234,6 +264,39 @@ public final class RefinedSupport {
         return Validation.valid(Collections.unmodifiableMap(copy));
     }
 
+    private static <K, V> Validation<Violation, Map<K, V>> validateMapEntryStreamSnapshot(
+        Stream<Map.Entry<K, V>> value,
+        String baseCode,
+        String containerKind
+    ) {
+        if (value == null) {
+            return Validation.invalid(emptyCollectionViolation(baseCode, containerKind));
+        }
+        LinkedHashMap<K, V> copy = new LinkedHashMap<K, V>();
+        try {
+            Iterator<Map.Entry<K, V>> iterator = value.iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<K, V> entry = iterator.next();
+                if (entry == null) {
+                    return Validation.invalid(invalidEntryViolation(baseCode, containerKind));
+                }
+                if (entry.getKey() == null) {
+                    return Validation.invalid(nullKeyViolation(baseCode, containerKind));
+                }
+                if (entry.getValue() == null) {
+                    return Validation.invalid(nullValueViolation(baseCode, containerKind));
+                }
+                copy.put(entry.getKey(), entry.getValue());
+            }
+        } catch (RuntimeException exception) {
+            return Validation.invalid(invalidEntryViolation(baseCode, containerKind));
+        }
+        if (copy.isEmpty()) {
+            return Validation.invalid(emptyCollectionViolation(baseCode, containerKind));
+        }
+        return Validation.valid(Collections.unmodifiableMap(copy));
+    }
+
     private static <T> Validation<Violation, SortedSet<T>> validateSortedSetSnapshot(
         SortedSet<T> value,
         String baseCode,
@@ -252,6 +315,34 @@ public final class RefinedSupport {
             }
         } catch (RuntimeException exception) {
             return Validation.invalid(invalidElementViolation(baseCode, containerKind));
+        }
+        return Validation.valid(Collections.unmodifiableSortedSet(copy));
+    }
+
+    private static <T> Validation<Violation, SortedSet<T>> validateSortedSetStreamSnapshot(
+        Stream<T> value,
+        Comparator<? super T> comparator,
+        String baseCode,
+        String containerKind
+    ) {
+        if (value == null) {
+            return Validation.invalid(emptyCollectionViolation(baseCode, containerKind));
+        }
+        TreeSet<T> copy = comparator == null ? new TreeSet<T>() : new TreeSet<T>(comparator);
+        try {
+            Iterator<T> iterator = value.iterator();
+            while (iterator.hasNext()) {
+                T element = iterator.next();
+                if (element == null) {
+                    return Validation.invalid(nullElementViolation(baseCode, containerKind));
+                }
+                copy.add(element);
+            }
+        } catch (RuntimeException exception) {
+            return Validation.invalid(invalidElementViolation(baseCode, containerKind));
+        }
+        if (copy.isEmpty()) {
+            return Validation.invalid(emptyCollectionViolation(baseCode, containerKind));
         }
         return Validation.valid(Collections.unmodifiableSortedSet(copy));
     }
@@ -281,6 +372,40 @@ public final class RefinedSupport {
         return Validation.valid(Collections.unmodifiableSortedMap(copy));
     }
 
+    private static <K, V> Validation<Violation, SortedMap<K, V>> validateSortedMapEntryStreamSnapshot(
+        Stream<Map.Entry<K, V>> value,
+        Comparator<? super K> comparator,
+        String baseCode,
+        String containerKind
+    ) {
+        if (value == null) {
+            return Validation.invalid(emptyCollectionViolation(baseCode, containerKind));
+        }
+        TreeMap<K, V> copy = comparator == null ? new TreeMap<K, V>() : new TreeMap<K, V>(comparator);
+        try {
+            Iterator<Map.Entry<K, V>> iterator = value.iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<K, V> entry = iterator.next();
+                if (entry == null) {
+                    return Validation.invalid(invalidEntryViolation(baseCode, containerKind));
+                }
+                if (entry.getKey() == null) {
+                    return Validation.invalid(nullKeyViolation(baseCode, containerKind));
+                }
+                if (entry.getValue() == null) {
+                    return Validation.invalid(nullValueViolation(baseCode, containerKind));
+                }
+                copy.put(entry.getKey(), entry.getValue());
+            }
+        } catch (RuntimeException exception) {
+            return Validation.invalid(invalidEntryViolation(baseCode, containerKind));
+        }
+        if (copy.isEmpty()) {
+            return Validation.invalid(emptyCollectionViolation(baseCode, containerKind));
+        }
+        return Validation.valid(Collections.unmodifiableSortedMap(copy));
+    }
+
     private static <T> Validation<Violation, NavigableSet<T>> validateNavigableSetSnapshot(
         NavigableSet<T> value,
         String baseCode,
@@ -299,6 +424,34 @@ public final class RefinedSupport {
             }
         } catch (RuntimeException exception) {
             return Validation.invalid(invalidElementViolation(baseCode, containerKind));
+        }
+        return Validation.valid(Collections.unmodifiableNavigableSet(copy));
+    }
+
+    private static <T> Validation<Violation, NavigableSet<T>> validateNavigableSetStreamSnapshot(
+        Stream<T> value,
+        Comparator<? super T> comparator,
+        String baseCode,
+        String containerKind
+    ) {
+        if (value == null) {
+            return Validation.invalid(emptyCollectionViolation(baseCode, containerKind));
+        }
+        TreeSet<T> copy = comparator == null ? new TreeSet<T>() : new TreeSet<T>(comparator);
+        try {
+            Iterator<T> iterator = value.iterator();
+            while (iterator.hasNext()) {
+                T element = iterator.next();
+                if (element == null) {
+                    return Validation.invalid(nullElementViolation(baseCode, containerKind));
+                }
+                copy.add(element);
+            }
+        } catch (RuntimeException exception) {
+            return Validation.invalid(invalidElementViolation(baseCode, containerKind));
+        }
+        if (copy.isEmpty()) {
+            return Validation.invalid(emptyCollectionViolation(baseCode, containerKind));
         }
         return Validation.valid(Collections.unmodifiableNavigableSet(copy));
     }
@@ -324,6 +477,40 @@ public final class RefinedSupport {
             }
         } catch (RuntimeException exception) {
             return Validation.invalid(invalidEntryViolation(baseCode, containerKind));
+        }
+        return Validation.valid(Collections.unmodifiableNavigableMap(copy));
+    }
+
+    private static <K, V> Validation<Violation, NavigableMap<K, V>> validateNavigableMapEntryStreamSnapshot(
+        Stream<Map.Entry<K, V>> value,
+        Comparator<? super K> comparator,
+        String baseCode,
+        String containerKind
+    ) {
+        if (value == null) {
+            return Validation.invalid(emptyCollectionViolation(baseCode, containerKind));
+        }
+        TreeMap<K, V> copy = comparator == null ? new TreeMap<K, V>() : new TreeMap<K, V>(comparator);
+        try {
+            Iterator<Map.Entry<K, V>> iterator = value.iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<K, V> entry = iterator.next();
+                if (entry == null) {
+                    return Validation.invalid(invalidEntryViolation(baseCode, containerKind));
+                }
+                if (entry.getKey() == null) {
+                    return Validation.invalid(nullKeyViolation(baseCode, containerKind));
+                }
+                if (entry.getValue() == null) {
+                    return Validation.invalid(nullValueViolation(baseCode, containerKind));
+                }
+                copy.put(entry.getKey(), entry.getValue());
+            }
+        } catch (RuntimeException exception) {
+            return Validation.invalid(invalidEntryViolation(baseCode, containerKind));
+        }
+        if (copy.isEmpty()) {
+            return Validation.invalid(emptyCollectionViolation(baseCode, containerKind));
         }
         return Validation.valid(Collections.unmodifiableNavigableMap(copy));
     }
@@ -981,6 +1168,10 @@ public final class RefinedSupport {
         return validateLinearSnapshot(value, "non-empty-list", "list");
     }
 
+    public static <T> Validation<Violation, List<T>> nonEmptyListStreamSnapshot(Stream<T> value) {
+        return validateLinearStreamSnapshot(value, "non-empty-list", "list");
+    }
+
     /**
      * Validates and snapshots a non-empty set while preserving failure causes.
      *
@@ -990,6 +1181,14 @@ public final class RefinedSupport {
      */
     public static <T> Validation<Violation, Set<T>> nonEmptySetSnapshot(Set<T> value) {
         return validateSetSnapshot(value, "non-empty-set", "set");
+    }
+
+    public static <T> Validation<Violation, Set<T>> nonEmptySetStreamSnapshot(Stream<T> value) {
+        Validation<Violation, List<T>> linear = validateLinearStreamSnapshot(value, "non-empty-set", "set");
+        if (linear.isInvalid()) {
+            return Validation.invalid(linear.getError());
+        }
+        return validateSetSnapshot(new LinkedHashSet<T>(linear.get()), "non-empty-set", "set");
     }
 
     /**
@@ -1004,6 +1203,12 @@ public final class RefinedSupport {
         return validateMapSnapshot(value, "non-empty-map", "map");
     }
 
+    public static <K, V> Validation<Violation, Map<K, V>> nonEmptyMapEntryStreamSnapshot(
+        Stream<Map.Entry<K, V>> value
+    ) {
+        return validateMapEntryStreamSnapshot(value, "non-empty-map", "map");
+    }
+
     /**
      * Validates and snapshots a non-empty queue while preserving failure causes.
      *
@@ -1013,6 +1218,10 @@ public final class RefinedSupport {
      */
     public static <T> Validation<Violation, List<T>> nonEmptyQueueSnapshot(Queue<T> value) {
         return validateLinearSnapshot(value, "non-empty-queue", "queue");
+    }
+
+    public static <T> Validation<Violation, List<T>> nonEmptyQueueStreamSnapshot(Stream<T> value) {
+        return validateLinearStreamSnapshot(value, "non-empty-queue", "queue");
     }
 
     /**
@@ -1026,6 +1235,10 @@ public final class RefinedSupport {
         return validateLinearSnapshot(value, "non-empty-deque", "deque");
     }
 
+    public static <T> Validation<Violation, List<T>> nonEmptyDequeStreamSnapshot(Stream<T> value) {
+        return validateLinearStreamSnapshot(value, "non-empty-deque", "deque");
+    }
+
     /**
      * Validates and snapshots a non-empty iterable while preserving failure causes.
      *
@@ -1037,6 +1250,10 @@ public final class RefinedSupport {
         return validateLinearSnapshot(value, "non-empty-iterable", "iterable");
     }
 
+    public static <T> Validation<Violation, List<T>> nonEmptyIterableStreamSnapshot(Stream<T> value) {
+        return validateLinearStreamSnapshot(value, "non-empty-iterable", "iterable");
+    }
+
     /**
      * Validates and snapshots a non-empty sorted set while preserving failure causes.
      *
@@ -1046,6 +1263,19 @@ public final class RefinedSupport {
      */
     public static <T> Validation<Violation, SortedSet<T>> nonEmptySortedSetSnapshot(SortedSet<T> value) {
         return validateSortedSetSnapshot(value, "non-empty-sorted-set", "sorted-set");
+    }
+
+    public static <T extends Comparable<? super T>> Validation<Violation, SortedSet<T>> nonEmptySortedSetStreamSnapshot(
+        Stream<T> value
+    ) {
+        return validateSortedSetStreamSnapshot(value, null, "non-empty-sorted-set", "sorted-set");
+    }
+
+    public static <T> Validation<Violation, SortedSet<T>> nonEmptySortedSetStreamSnapshot(
+        Stream<T> value,
+        Comparator<? super T> comparator
+    ) {
+        return validateSortedSetStreamSnapshot(value, comparator, "non-empty-sorted-set", "sorted-set");
     }
 
     /**
@@ -1060,6 +1290,19 @@ public final class RefinedSupport {
         return validateSortedMapSnapshot(value, "non-empty-sorted-map", "sorted-map");
     }
 
+    public static <K extends Comparable<? super K>, V> Validation<Violation, SortedMap<K, V>> nonEmptySortedMapEntryStreamSnapshot(
+        Stream<Map.Entry<K, V>> value
+    ) {
+        return validateSortedMapEntryStreamSnapshot(value, null, "non-empty-sorted-map", "sorted-map");
+    }
+
+    public static <K, V> Validation<Violation, SortedMap<K, V>> nonEmptySortedMapEntryStreamSnapshot(
+        Stream<Map.Entry<K, V>> value,
+        Comparator<? super K> comparator
+    ) {
+        return validateSortedMapEntryStreamSnapshot(value, comparator, "non-empty-sorted-map", "sorted-map");
+    }
+
     /**
      * Validates and snapshots a non-empty navigable set while preserving failure causes.
      *
@@ -1069,6 +1312,19 @@ public final class RefinedSupport {
      */
     public static <T> Validation<Violation, NavigableSet<T>> nonEmptyNavigableSetSnapshot(NavigableSet<T> value) {
         return validateNavigableSetSnapshot(value, "non-empty-navigable-set", "navigable-set");
+    }
+
+    public static <T extends Comparable<? super T>> Validation<Violation, NavigableSet<T>> nonEmptyNavigableSetStreamSnapshot(
+        Stream<T> value
+    ) {
+        return validateNavigableSetStreamSnapshot(value, null, "non-empty-navigable-set", "navigable-set");
+    }
+
+    public static <T> Validation<Violation, NavigableSet<T>> nonEmptyNavigableSetStreamSnapshot(
+        Stream<T> value,
+        Comparator<? super T> comparator
+    ) {
+        return validateNavigableSetStreamSnapshot(value, comparator, "non-empty-navigable-set", "navigable-set");
     }
 
     /**
@@ -1081,6 +1337,19 @@ public final class RefinedSupport {
      */
     public static <K, V> Validation<Violation, NavigableMap<K, V>> nonEmptyNavigableMapSnapshot(NavigableMap<K, V> value) {
         return validateNavigableMapSnapshot(value, "non-empty-navigable-map", "navigable-map");
+    }
+
+    public static <K extends Comparable<? super K>, V> Validation<Violation, NavigableMap<K, V>> nonEmptyNavigableMapEntryStreamSnapshot(
+        Stream<Map.Entry<K, V>> value
+    ) {
+        return validateNavigableMapEntryStreamSnapshot(value, null, "non-empty-navigable-map", "navigable-map");
+    }
+
+    public static <K, V> Validation<Violation, NavigableMap<K, V>> nonEmptyNavigableMapEntryStreamSnapshot(
+        Stream<Map.Entry<K, V>> value,
+        Comparator<? super K> comparator
+    ) {
+        return validateNavigableMapEntryStreamSnapshot(value, comparator, "non-empty-navigable-map", "navigable-map");
     }
 
     public static <T> List<T> copyIterableToList(Iterable<T> value) {

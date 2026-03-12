@@ -1,17 +1,22 @@
 package io.github.junggikim.refined.refined.collection;
 
+import java.util.AbstractMap;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.stream.Stream;
 import io.github.junggikim.refined.core.RefinementException;
-import io.github.junggikim.refined.internal.AbstractRefined;
 import io.github.junggikim.refined.internal.RefinedSupport;
-import io.github.junggikim.refined.newtype.Newtype;
 import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
-import java.util.SortedMap;
 
-public final class NonEmptySortedMap<K, V> extends AbstractRefined<SortedMap<K, V>> implements Newtype<SortedMap<K, V>> {
+public final class NonEmptySortedMap<K, V> extends AbstractMap<K, V> implements SortedMap<K, V> {
 
-    private NonEmptySortedMap(SortedMap<K, V> value) {
-        super(value);
+    private final SortedMap<K, V> entries;
+
+    private NonEmptySortedMap(SortedMap<K, V> entries) {
+        this.entries = entries;
     }
 
     public static <K, V> Validation<Violation, NonEmptySortedMap<K, V>> of(SortedMap<K, V> value) {
@@ -26,11 +31,92 @@ public final class NonEmptySortedMap<K, V> extends AbstractRefined<SortedMap<K, 
         throw new RefinementException(result.getError());
     }
 
-    public K firstKey() {
-        return value().firstKey();
+    public static <K extends Comparable<? super K>, V> Validation<Violation, NonEmptySortedMap<K, V>> ofEntryStream(
+        Stream<Map.Entry<K, V>> value
+    ) {
+        return RefinedSupport.nonEmptySortedMapEntryStreamSnapshot(value).map(NonEmptySortedMap::new);
     }
 
+    public static <K, V> Validation<Violation, NonEmptySortedMap<K, V>> ofEntryStream(
+        Stream<Map.Entry<K, V>> value,
+        Comparator<? super K> comparator
+    ) {
+        return RefinedSupport.nonEmptySortedMapEntryStreamSnapshot(value, comparator).map(NonEmptySortedMap::new);
+    }
+
+    public static <K extends Comparable<? super K>, V> NonEmptySortedMap<K, V> unsafeOfEntryStream(
+        Stream<Map.Entry<K, V>> value
+    ) {
+        Validation<Violation, NonEmptySortedMap<K, V>> result = ofEntryStream(value);
+        if (result.isValid()) {
+            return result.get();
+        }
+        throw new RefinementException(result.getError());
+    }
+
+    public static <K, V> NonEmptySortedMap<K, V> unsafeOfEntryStream(
+        Stream<Map.Entry<K, V>> value,
+        Comparator<? super K> comparator
+    ) {
+        Validation<Violation, NonEmptySortedMap<K, V>> result = ofEntryStream(value, comparator);
+        if (result.isValid()) {
+            return result.get();
+        }
+        throw new RefinementException(result.getError());
+    }
+
+    @Override
+    public Set<Map.Entry<K, V>> entrySet() {
+        return entries.entrySet();
+    }
+
+    @Override
+    public Comparator<? super K> comparator() {
+        return entries.comparator();
+    }
+
+    @Override
+    public SortedMap<K, V> subMap(K fromKey, K toKey) {
+        return entries.subMap(fromKey, toKey);
+    }
+
+    @Override
+    public SortedMap<K, V> headMap(K toKey) {
+        return entries.headMap(toKey);
+    }
+
+    @Override
+    public SortedMap<K, V> tailMap(K fromKey) {
+        return entries.tailMap(fromKey);
+    }
+
+    @Override
+    public K firstKey() {
+        return entries.firstKey();
+    }
+
+    @Override
     public K lastKey() {
-        return value().lastKey();
+        return entries.lastKey();
+    }
+
+    @Override
+    public V get(Object key) {
+        return entries.get(key);
+    }
+
+    @Override
+    public boolean containsKey(Object key) {
+        return entries.containsKey(key);
+    }
+
+    @Override
+    public boolean containsValue(Object value) {
+        return entries.containsValue(value);
+    }
+
+    @Override
+    public int size() {
+        return entries.size();
     }
 }
