@@ -4,7 +4,9 @@
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Java Refined is a Java 8+ library for refinement types, non-empty collections,
-and small functional control types without runtime dependencies.
+and small functional control types. The core `java-refined` artifact has no
+runtime dependencies, and the optional `java-refined-kotlin` artifact adds a
+single Kotlin runtime dependency on `kotlin-stdlib`.
 
 It lets you move validation out of scattered `if` checks and into explicit
 types such as `PositiveInt`, `NonBlankString`, and `NonEmptyList`.
@@ -12,9 +14,15 @@ types such as `PositiveInt`, `NonBlankString`, and `NonEmptyList`.
 This project is open source under the MIT license, so you can use, modify, and
 distribute it in personal or commercial codebases.
 
+Java-only projects can use `java-refined` with no runtime dependencies.
+Kotlin/JVM projects can optionally add `java-refined-kotlin` for Kotlin-first
+extensions and collection adapters, which adds a single runtime dependency on
+`org.jetbrains.kotlin:kotlin-stdlib`.
+
 ## Features
 
-- zero runtime dependencies
+- zero runtime dependencies in the core `java-refined` module
+- optional Kotlin/JVM support module with Kotlin-first extensions and one `kotlin-stdlib` runtime dependency
 - Java 8 bytecode baseline with Java 8+ APIs
 - refined wrappers with safe `of` and throwing `unsafeOf` constructors
 - fail-fast `Validation` and error-accumulating `Validated`
@@ -64,20 +72,45 @@ object with `isValid()`, `get()`, `getError()`, or `fold(...)`.
 This library is currently distributed via source checkout and local Maven builds only.
 From a source checkout, run `./gradlew publishToMavenLocal` and resolve the dependency through the local Maven repository.
 
+### Java Only
+
+Use only the core `java-refined` artifact when your codebase is Java-only.
+
 Local install checklist:
 
 1. Run `./gradlew publishToMavenLocal`.
 2. Add `mavenLocal()` to your repositories.
-3. Add the dependency coordinates shown below.
+3. Add `io.github.junggikim:java-refined:1.1.0`.
+
+The core module has no extra runtime dependencies beyond the JDK modules it already uses.
+
+### Kotlin/JVM
+
+Add the optional `java-refined-kotlin` module only when you want Kotlin-first
+extensions and collection adapters on top of the Java core API.
+
+Local install checklist:
+
+1. Run `./gradlew publishToMavenLocal`.
+2. Add `mavenLocal()` and `mavenCentral()` to your repositories.
+3. Add both `java-refined` and `java-refined-kotlin`.
+
+The Kotlin support module adds one runtime dependency: `org.jetbrains.kotlin:kotlin-stdlib`.
 
 ## Coordinates
 
 ```text
-io.github.junggikim:java-refined
-io.github.junggikim:java-refined-kotlin
+Java only:
+io.github.junggikim:java-refined:1.1.0
+
+Kotlin/JVM:
+io.github.junggikim:java-refined:1.1.0
+io.github.junggikim:java-refined-kotlin:1.1.0
 ```
 
 ### Gradle Kotlin DSL
+
+Java only:
 
 ```kotlin
 repositories {
@@ -85,12 +118,27 @@ repositories {
 }
 
 dependencies {
-    implementation("io.github.junggikim:java-refined:1.0.0")
-    implementation("io.github.junggikim:java-refined-kotlin:1.0.0")
+    implementation("io.github.junggikim:java-refined:1.1.0")
+}
+```
+
+Kotlin/JVM:
+
+```kotlin
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation("io.github.junggikim:java-refined:1.1.0")
+    implementation("io.github.junggikim:java-refined-kotlin:1.1.0")
 }
 ```
 
 ### Gradle Groovy DSL
+
+Java only:
 
 ```groovy
 repositories {
@@ -98,27 +146,53 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.github.junggikim:java-refined:1.0.0'
-    implementation 'io.github.junggikim:java-refined-kotlin:1.0.0'
+    implementation 'io.github.junggikim:java-refined:1.1.0'
+}
+```
+
+Kotlin/JVM:
+
+```groovy
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.github.junggikim:java-refined:1.1.0'
+    implementation 'io.github.junggikim:java-refined-kotlin:1.1.0'
 }
 ```
 
 ### Maven
 
+Java only:
+
 ```xml
 <dependency>
   <groupId>io.github.junggikim</groupId>
   <artifactId>java-refined</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
+</dependency>
+```
+
+Kotlin/JVM:
+
+```xml
+<dependency>
+  <groupId>io.github.junggikim</groupId>
+  <artifactId>java-refined</artifactId>
+  <version>1.1.0</version>
 </dependency>
 <dependency>
   <groupId>io.github.junggikim</groupId>
   <artifactId>java-refined-kotlin</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
 </dependency>
 ```
 
-Ensure the artifact has been published to the local Maven repository before resolving it from Maven.
+Ensure the artifacts have been published to the local Maven repository before resolving them.
+For Kotlin/JVM usage, keep access to Maven Central unless your build already provides `kotlin-stdlib`.
 
 ## Basic Usage
 
@@ -168,7 +242,10 @@ String status = address.fold(
 
 ## Kotlin/JVM Usage
 
-`java-refined-kotlin` is a thin Kotlin-first layer on top of the core Java API.
+`java-refined-kotlin` is an optional Kotlin/JVM support module. It is not
+required for Java-only usage.
+
+It is a thin Kotlin-first layer on top of the core Java API.
 It keeps the same validation semantics while adding:
 
 - nullable receiver extensions such as `toNonBlankString()` and `toPositiveInt()`
@@ -616,7 +693,7 @@ See [docs/compatibility.md](docs/compatibility.md) for Java version caveats.
 
 ## Project Status
 
-- current local version line: `1.0.0`
+- current local version line: `1.1.0`
 - distribution: source checkout and local Maven only
 - release notes live in [CHANGELOG.md](CHANGELOG.md)
 

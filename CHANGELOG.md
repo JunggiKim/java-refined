@@ -7,6 +7,20 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-03-12
+
+### Added
+
+- optional `java-refined-kotlin` support module for Kotlin/JVM consumers
+- Kotlin extension functions for refined scalar and collection factories
+- Kotlin read-only adapters for refined non-empty collections
+- Kotlin validation helpers such as `getOrNull()`, `errorOrNull()`, and `getOrThrow()`
+
+### Changed
+
+- collection refined wrappers expose richer collection ergonomics while preserving immutable snapshot semantics
+- documentation now distinguishes Java-only usage from optional Kotlin/JVM usage and calls out the Kotlin runtime dependency
+
 ## [1.0.0] - 2026-03-11
 
 ### Added
