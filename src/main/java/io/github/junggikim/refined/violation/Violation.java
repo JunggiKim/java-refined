@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Structured validation failure containing a machine-friendly code and human-readable message.
@@ -23,7 +25,7 @@ public final class Violation implements Serializable {
      * @param message human-readable explanation
      * @param metadata optional metadata copied into an immutable map
      */
-    public Violation(String code, String message, Map<String, Object> metadata) {
+    public Violation(@NotNull String code, @NotNull String message, @Nullable Map<String, Object> metadata) {
         this.code = Objects.requireNonNull(code, "code");
         this.message = Objects.requireNonNull(message, "message");
         this.metadata = copyMetadata(metadata);
@@ -36,7 +38,8 @@ public final class Violation implements Serializable {
      * @param message human-readable explanation
      * @return violation without metadata
      */
-    public static Violation of(String code, String message) {
+    @NotNull
+    public static Violation of(@NotNull String code, @NotNull String message) {
         return new Violation(code, message, Collections.<String, Object>emptyMap());
     }
 
@@ -47,7 +50,8 @@ public final class Violation implements Serializable {
      * @param value metadata value
      * @return new violation instance
      */
-    public Violation withMetadata(String key, Object value) {
+    @NotNull
+    public Violation withMetadata(@NotNull String key, @NotNull Object value) {
         LinkedHashMap<String, Object> next = new LinkedHashMap<>(metadata);
         next.put(key, value);
         return new Violation(code, message, next);
@@ -58,6 +62,7 @@ public final class Violation implements Serializable {
      *
      * @return violation code
      */
+    @NotNull
     public String code() {
         return code;
     }
@@ -67,6 +72,7 @@ public final class Violation implements Serializable {
      *
      * @return violation message
      */
+    @NotNull
     public String message() {
         return message;
     }
@@ -76,11 +82,43 @@ public final class Violation implements Serializable {
      *
      * @return immutable metadata map
      */
+    @NotNull
     public Map<String, Object> metadata() {
         return Collections.unmodifiableMap(new LinkedHashMap<String, Object>(metadata));
     }
 
-    private static Map<String, Object> copyMetadata(Map<String, Object> source) {
+    /**
+     * Kotlin-friendly bean getter bridge for {@link #code()}.
+     *
+     * @return violation code
+     */
+    @NotNull
+    public String getCode() {
+        return code();
+    }
+
+    /**
+     * Kotlin-friendly bean getter bridge for {@link #message()}.
+     *
+     * @return violation message
+     */
+    @NotNull
+    public String getMessage() {
+        return message();
+    }
+
+    /**
+     * Kotlin-friendly bean getter bridge for {@link #metadata()}.
+     *
+     * @return immutable metadata map
+     */
+    @NotNull
+    public Map<String, Object> getMetadata() {
+        return metadata();
+    }
+
+    @NotNull
+    private static Map<String, Object> copyMetadata(@Nullable Map<String, Object> source) {
         LinkedHashMap<String, Object> copy = new LinkedHashMap<>();
         if (source != null) {
             for (Map.Entry<String, Object> entry : source.entrySet()) {
@@ -91,7 +129,7 @@ public final class Violation implements Serializable {
     }
 
     @Override
-    public boolean equals(Object other) {
+    public boolean equals(@Nullable Object other) {
         if (this == other) {
             return true;
         }
@@ -110,6 +148,7 @@ public final class Violation implements Serializable {
     }
 
     @Override
+    @NotNull
     public String toString() {
         return "Violation[code=" + code + ", message=" + message + ", metadata=" + metadata + "]";
     }

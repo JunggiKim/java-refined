@@ -1,17 +1,19 @@
 package io.github.junggikim.refined.refined.collection;
 
+import java.util.AbstractList;
+import java.util.List;
+import java.util.stream.Stream;
 import io.github.junggikim.refined.core.RefinementException;
-import io.github.junggikim.refined.internal.AbstractRefined;
 import io.github.junggikim.refined.internal.RefinedSupport;
-import io.github.junggikim.refined.newtype.Newtype;
 import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
-import java.util.List;
 
-public final class NonEmptyIterable<T> extends AbstractRefined<List<T>> implements Newtype<List<T>>, Iterable<T> {
+public final class NonEmptyIterable<T> extends AbstractList<T> {
 
-    private NonEmptyIterable(List<T> value) {
-        super(value);
+    private final List<T> elements;
+
+    private NonEmptyIterable(List<T> elements) {
+        this.elements = elements;
     }
 
     public static <T> Validation<Violation, NonEmptyIterable<T>> of(Iterable<T> value) {
@@ -26,16 +28,33 @@ public final class NonEmptyIterable<T> extends AbstractRefined<List<T>> implemen
         throw new RefinementException(result.getError());
     }
 
-    public T head() {
-        return value().get(0);
+    public static <T> Validation<Violation, NonEmptyIterable<T>> ofStream(Stream<T> value) {
+        return RefinedSupport.nonEmptyIterableStreamSnapshot(value).map(snapshot -> new NonEmptyIterable<T>(snapshot));
     }
 
-    public List<T> tail() {
-        return value().subList(1, value().size());
+    public static <T> NonEmptyIterable<T> unsafeOfStream(Stream<T> value) {
+        Validation<Violation, NonEmptyIterable<T>> result = ofStream(value);
+        if (result.isValid()) {
+            return result.get();
+        }
+        throw new RefinementException(result.getError());
     }
 
     @Override
-    public java.util.Iterator<T> iterator() {
-        return value().iterator();
+    public T get(int index) {
+        return elements.get(index);
+    }
+
+    @Override
+    public int size() {
+        return elements.size();
+    }
+
+    public T head() {
+        return get(0);
+    }
+
+    public List<T> tail() {
+        return elements.subList(1, elements.size());
     }
 }

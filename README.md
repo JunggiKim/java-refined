@@ -29,6 +29,7 @@ distribute it in personal or commercial codebases.
 - [Installation](#installation)
 - [Coordinates](#coordinates)
 - [Basic Usage](#basic-usage)
+- [Kotlin/JVM Usage](#kotlinjvm-usage)
 - [Error Handling](#error-handling)
 - [Core Concepts](#core-concepts)
 - [Core API](#core-api)
@@ -73,6 +74,7 @@ Local install checklist:
 
 ```text
 io.github.junggikim:java-refined
+io.github.junggikim:java-refined-kotlin
 ```
 
 ### Gradle Kotlin DSL
@@ -84,6 +86,7 @@ repositories {
 
 dependencies {
     implementation("io.github.junggikim:java-refined:1.0.0")
+    implementation("io.github.junggikim:java-refined-kotlin:1.0.0")
 }
 ```
 
@@ -96,6 +99,7 @@ repositories {
 
 dependencies {
     implementation 'io.github.junggikim:java-refined:1.0.0'
+    implementation 'io.github.junggikim:java-refined-kotlin:1.0.0'
 }
 ```
 
@@ -105,6 +109,11 @@ dependencies {
 <dependency>
   <groupId>io.github.junggikim</groupId>
   <artifactId>java-refined</artifactId>
+  <version>1.0.0</version>
+</dependency>
+<dependency>
+  <groupId>io.github.junggikim</groupId>
+  <artifactId>java-refined-kotlin</artifactId>
   <version>1.0.0</version>
 </dependency>
 ```
@@ -127,7 +136,20 @@ Validation<Violation, NonEmptyList<String>> tags = NonEmptyList.of(Arrays.asList
 
 Validation<Violation, String> summary =
     name.zip(age, (n, a) -> n.value() + " (" + a.value() + ")");
+
+boolean hasJavaTag = tags.get().contains("java");
+Validation<Violation, NonEmptyList<String>> upperTags =
+    NonEmptyList.ofStream(tags.get().stream().map(String::toUpperCase));
 ```
+
+Refined wrappers are created through factory methods, not public constructors.
+Use `of(...)` when invalid input is part of normal control flow, and use
+`unsafeOf(...)` when invalid input should fail fast.
+
+Collection refined types are direct-compatible immutable JDK collections.
+`NonEmptyList<T>` can be passed anywhere a `List<T>` is expected, and
+`NonEmptyMap<K, V>` can be passed anywhere a `Map<K, V>` is expected, without
+calling an extra unwrap method.
 
 More refined wrappers, including `NaturalInt` and `Ipv6String`:
 
@@ -143,6 +165,41 @@ String status = address.fold(
     ok -> "ip ok: " + ok.value()
 );
 ```
+
+## Kotlin/JVM Usage
+
+`java-refined-kotlin` is a thin Kotlin-first layer on top of the core Java API.
+It keeps the same validation semantics while adding:
+
+- nullable receiver extensions such as `toNonBlankString()` and `toPositiveInt()`
+- `Validation` convenience helpers such as `getOrNull()`, `errorOrNull()`, and `getOrThrow()`
+- read-only Kotlin adapters for refined non-empty collections
+- `Sequence`-based factory extensions for collection refinement
+
+```kotlin
+import io.github.junggikim.refined.kotlin.errorOrNull
+import io.github.junggikim.refined.kotlin.getOrThrow
+import io.github.junggikim.refined.kotlin.toNonBlankString
+import io.github.junggikim.refined.kotlin.toNonBlankStringOrThrow
+import io.github.junggikim.refined.kotlin.toNonEmptyListOrThrow
+
+val name = "Ada".toNonBlankStringOrThrow()
+val nullableName = (null as String?).toNonBlankString()
+
+val message = nullableName.errorOrNull()!!.message
+val value: String = name.value
+
+val tags: List<String> = listOf("java", "fp").toNonEmptyListOrThrow()
+val upper = tags.map(String::uppercase)
+val refinedUpper = upper.toNonEmptyListOrThrow()
+```
+
+Kotlin collection adapters are read-only views over the Java refined collections.
+They keep the same validation rules and immutable snapshot semantics, but mutator
+methods such as `add`, `put`, `offer`, or `addFirst` are not available from Kotlin.
+
+This means Kotlin code can stay concise and idiomatic while Java code keeps using
+the same core refined wrappers and validation model.
 
 ## Error Handling
 
@@ -167,12 +224,19 @@ List<String> errors = left.zip(right, Integer::sum).getErrors();
 
 ## Core Concepts
 
-Refined wrappers expose two constructors:
+Refined wrappers expose two factory methods:
 
 - `of(value)` returns `Validation<Violation, T>` and never throws.
 - `unsafeOf(value)` throws `RefinementException` on invalid input.
 
 `Validation` is fail-fast and stops at the first error. `Validated` accumulates multiple errors into a non-empty list.
+
+For scalar wrappers such as `PositiveInt` or `NonBlankString`, the refined object
+stores the validated runtime value and exposes it through `value()`.
+
+For collection wrappers such as `NonEmptyList` or `NonEmptyMap`, the refined object
+is itself the collection interface. It preserves the non-empty invariant and immutable
+snapshot semantics while remaining directly usable as a JDK collection.
 
 ## Core API
 
@@ -183,6 +247,9 @@ Refined wrappers expose two constructors:
   - validates first
   - throws `RefinementException` on failure
   - use only at trusted boundaries after validation has already happened
+- collection wrappers additionally expose stream-based constructors
+  - `ofStream(stream)` for list/set/queue/deque/iterable/set-like wrappers
+  - `ofEntryStream(stream)` for map-like wrappers
 - `Violation`
   - stable `code`, human-readable `message`, immutable `metadata`
   - collection constructors distinguish `*-empty`, `*-null-element`, `*-null-key`, `*-null-value`, and sorted/navigable `*-invalid-*` failures
@@ -390,16 +457,16 @@ Each table lists a type and the invariant it enforces.
 
 | Type | Description |
 | --- | --- |
-| `NonEmptyList` | non-empty list with no null elements; immutable snapshot |
-| `NonEmptySet` | non-empty set with no null elements; immutable snapshot |
-| `NonEmptyMap` | non-empty map with no null keys/values; immutable snapshot |
-| `NonEmptyDeque` | non-empty deque snapshot as immutable list; no null elements |
-| `NonEmptyQueue` | non-empty queue snapshot as immutable list; no null elements |
-| `NonEmptyIterable` | non-empty iterable snapshot as immutable list; no null elements |
-| `NonEmptySortedSet` | non-empty sorted set with no null elements; immutable snapshot |
-| `NonEmptySortedMap` | non-empty sorted map with no null keys/values; immutable snapshot |
-| `NonEmptyNavigableSet` | non-empty navigable set with no null elements; immutable snapshot |
-| `NonEmptyNavigableMap` | non-empty navigable map with no null keys/values; immutable snapshot |
+| `NonEmptyList` | non-empty immutable `List` with no null elements |
+| `NonEmptySet` | non-empty immutable `Set` with no null elements |
+| `NonEmptyMap` | non-empty immutable `Map` with no null keys/values |
+| `NonEmptyDeque` | non-empty immutable `Deque` snapshot with no null elements |
+| `NonEmptyQueue` | non-empty immutable `Queue` snapshot with no null elements |
+| `NonEmptyIterable` | non-empty immutable sequence snapshot with no null elements |
+| `NonEmptySortedSet` | non-empty immutable `SortedSet` with no null elements |
+| `NonEmptySortedMap` | non-empty immutable `SortedMap` with no null keys/values |
+| `NonEmptyNavigableSet` | non-empty immutable `NavigableSet` with no null elements |
+| `NonEmptyNavigableMap` | non-empty immutable `NavigableMap` with no null keys/values |
 
 ### Control Types
 

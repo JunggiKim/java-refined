@@ -3,6 +3,7 @@ package io.github.junggikim.refined.validation;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Fail-fast validation result used by refined constructors and low-level constraints.
@@ -20,7 +21,8 @@ public interface Validation<E, A> {
      * @param <A> success type
      * @return valid result
      */
-    static <E, A> Validation<E, A> valid(A value) {
+    @NotNull
+    static <E, A> Validation<E, A> valid(@NotNull A value) {
         return new Valid<>(value);
     }
 
@@ -32,7 +34,8 @@ public interface Validation<E, A> {
      * @param <A> success type
      * @return invalid result
      */
-    static <E, A> Validation<E, A> invalid(E error) {
+    @NotNull
+    static <E, A> Validation<E, A> invalid(@NotNull E error) {
         return new Invalid<>(error);
     }
 
@@ -59,7 +62,8 @@ public interface Validation<E, A> {
      * @param <B> mapped success type
      * @return mapped valid result or the original invalid result
      */
-    <B> Validation<E, B> map(Function<? super A, ? extends B> mapper);
+    @NotNull
+    <B> Validation<E, B> map(@NotNull Function<? super A, ? extends B> mapper);
 
     /**
      * Chains another validation when this result is valid.
@@ -68,7 +72,8 @@ public interface Validation<E, A> {
      * @param <B> mapped success type
      * @return chained validation or the original invalid result
      */
-    <B> Validation<E, B> flatMap(Function<? super A, Validation<E, B>> mapper);
+    @NotNull
+    <B> Validation<E, B> flatMap(@NotNull Function<? super A, Validation<E, B>> mapper);
 
     /**
      * Folds both branches into a single value.
@@ -78,7 +83,8 @@ public interface Validation<E, A> {
      * @param <B> fold result type
      * @return branch result
      */
-    <B> B fold(Function<? super E, ? extends B> onInvalid, Function<? super A, ? extends B> onValid);
+    @NotNull
+    <B> B fold(@NotNull Function<? super E, ? extends B> onInvalid, @NotNull Function<? super A, ? extends B> onValid);
 
     /**
      * Combines two validations and keeps the first encountered error when one side fails.
@@ -89,9 +95,10 @@ public interface Validation<E, A> {
      * @param <C> combined success type
      * @return combined validation result
      */
+    @NotNull
     default <B, C> Validation<E, C> zip(
-        Validation<E, B> other,
-        BiFunction<? super A, ? super B, ? extends C> mapper
+        @NotNull Validation<E, B> other,
+        @NotNull BiFunction<? super A, ? super B, ? extends C> mapper
     ) {
         if (isValid() && other.isValid()) {
             return valid(mapper.apply(get(), other.get()));
@@ -104,6 +111,7 @@ public interface Validation<E, A> {
      *
      * @return validated value
      */
+    @NotNull
     A get();
 
     /**
@@ -111,12 +119,13 @@ public interface Validation<E, A> {
      *
      * @return validation error
      */
+    @NotNull
     E getError();
 
     final class Valid<E, A> implements Validation<E, A> {
         private final A value;
 
-        public Valid(A value) {
+        public Valid(@NotNull A value) {
             this.value = Objects.requireNonNull(value, "value");
         }
 
@@ -126,26 +135,31 @@ public interface Validation<E, A> {
         }
 
         @Override
-        public <B> Validation<E, B> map(Function<? super A, ? extends B> mapper) {
+        @NotNull
+        public <B> Validation<E, B> map(@NotNull Function<? super A, ? extends B> mapper) {
             return valid(mapper.apply(value));
         }
 
         @Override
-        public <B> Validation<E, B> flatMap(Function<? super A, Validation<E, B>> mapper) {
+        @NotNull
+        public <B> Validation<E, B> flatMap(@NotNull Function<? super A, Validation<E, B>> mapper) {
             return Objects.requireNonNull(mapper.apply(value), "mapper result");
         }
 
         @Override
-        public <B> B fold(Function<? super E, ? extends B> onInvalid, Function<? super A, ? extends B> onValid) {
+        @NotNull
+        public <B> B fold(@NotNull Function<? super E, ? extends B> onInvalid, @NotNull Function<? super A, ? extends B> onValid) {
             return onValid.apply(value);
         }
 
         @Override
+        @NotNull
         public A get() {
             return value;
         }
 
         @Override
+        @NotNull
         public E getError() {
             throw new IllegalStateException("Valid does not contain an error");
         }
@@ -168,6 +182,7 @@ public interface Validation<E, A> {
         }
 
         @Override
+        @NotNull
         public String toString() {
             return "Valid[value=" + value + "]";
         }
@@ -176,7 +191,7 @@ public interface Validation<E, A> {
     final class Invalid<E, A> implements Validation<E, A> {
         private final E error;
 
-        public Invalid(E error) {
+        public Invalid(@NotNull E error) {
             this.error = Objects.requireNonNull(error, "error");
         }
 
@@ -186,26 +201,31 @@ public interface Validation<E, A> {
         }
 
         @Override
-        public <B> Validation<E, B> map(Function<? super A, ? extends B> mapper) {
+        @NotNull
+        public <B> Validation<E, B> map(@NotNull Function<? super A, ? extends B> mapper) {
             return invalid(error);
         }
 
         @Override
-        public <B> Validation<E, B> flatMap(Function<? super A, Validation<E, B>> mapper) {
+        @NotNull
+        public <B> Validation<E, B> flatMap(@NotNull Function<? super A, Validation<E, B>> mapper) {
             return invalid(error);
         }
 
         @Override
-        public <B> B fold(Function<? super E, ? extends B> onInvalid, Function<? super A, ? extends B> onValid) {
+        @NotNull
+        public <B> B fold(@NotNull Function<? super E, ? extends B> onInvalid, @NotNull Function<? super A, ? extends B> onValid) {
             return onInvalid.apply(error);
         }
 
         @Override
+        @NotNull
         public A get() {
             throw new IllegalStateException("Invalid does not contain a value");
         }
 
         @Override
+        @NotNull
         public E getError() {
             return error;
         }
@@ -228,6 +248,7 @@ public interface Validation<E, A> {
         }
 
         @Override
+        @NotNull
         public String toString() {
             return "Invalid[error=" + error + "]";
         }

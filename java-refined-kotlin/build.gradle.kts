@@ -1,26 +1,19 @@
-import com.github.spotbugs.snom.Confidence
-import com.github.spotbugs.snom.Effort
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.testing.Test
-import org.gradle.api.tasks.compile.JavaCompile
-import org.gradle.api.tasks.javadoc.Javadoc
-import org.gradle.external.javadoc.StandardJavadocDocletOptions
 import org.gradle.jvm.tasks.Jar
 import org.gradle.jvm.toolchain.JavaLanguageVersion
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    kotlin("jvm") version "1.9.25"
     `java-library`
     `maven-publish`
     jacoco
-    checkstyle
-    pmd
-    id("com.github.spotbugs") version "6.4.8"
 }
 
-val groupId = property("group") as String
-val libraryVersion = property("version") as String
-val junitVersion = property("junitVersion") as String
-val jetbrainsAnnotationsVersion = property("jetbrainsAnnotationsVersion") as String
+val groupId = rootProject.property("group") as String
+val libraryVersion = rootProject.property("version") as String
+val junitVersion = rootProject.property("junitVersion") as String
 val projectUrl = "https://github.com/JunggiKim/java-refined"
 val developerId = "junggikim"
 val developerName = "Junggi Kim"
@@ -36,15 +29,18 @@ java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
     withSourcesJar()
-    withJavadocJar()
 }
 
 dependencies {
-    compileOnly("org.jetbrains:annotations:$jetbrainsAnnotationsVersion")
-    testCompileOnly("org.jetbrains:annotations:$jetbrainsAnnotationsVersion")
+    api(project(":"))
+    implementation(kotlin("stdlib"))
+
     testImplementation(platform("org.junit:junit-bom:$junitVersion"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.5.0")
+    testImplementation(kotlin("test"))
+    testImplementation(gradleTestKit())
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
@@ -57,8 +53,15 @@ tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
+tasks.withType<KotlinCompile>().configureEach {
+    kotlinOptions {
+        jvmTarget = "1.8"
+        freeCompilerArgs = freeCompilerArgs + "-Xjsr305=strict"
+    }
+}
+
 tasks.register<Test>("testJava8") {
-    description = "Runs the test suite on a Java 8 runtime via Gradle toolchains."
+    description = "Runs the Kotlin support test suite on a Java 8 runtime via Gradle toolchains."
     group = "verification"
     testClassesDirs = testSourceSet.get().output.classesDirs
     classpath = testSourceSet.get().runtimeClasspath
@@ -66,56 +69,8 @@ tasks.register<Test>("testJava8") {
     shouldRunAfter(tasks.named<Test>("test"))
 }
 
-tasks.withType<JavaCompile>().configureEach {
-    sourceCompatibility = JavaVersion.VERSION_1_8.toString()
-    targetCompatibility = JavaVersion.VERSION_1_8.toString()
-    options.encoding = "UTF-8"
-    options.compilerArgs.add("-Xlint:-options")
-    if (JavaVersion.current().isJava9Compatible) {
-        options.release.set(8)
-    }
-}
-
-tasks.withType<Javadoc>().configureEach {
-    val javadocOptions = options as StandardJavadocDocletOptions
-    javadocOptions.encoding = "UTF-8"
-    javadocOptions.charSet = "UTF-8"
-    javadocOptions.addStringOption("Xdoclint:all,-missing", "-quiet")
-    if (JavaVersion.current().isJava9Compatible) {
-        javadocOptions.addBooleanOption("html5", true)
-    }
-    title = "Java Refined ${project.version} API"
-}
-
 jacoco {
     toolVersion = "0.8.12"
-}
-
-checkstyle {
-    toolVersion = "10.21.1"
-    configFile = file("config/checkstyle/checkstyle.xml")
-}
-
-tasks.withType<org.gradle.api.plugins.quality.Checkstyle>().configureEach {
-    isIgnoreFailures = false
-}
-
-spotbugs {
-    ignoreFailures.set(false)
-    effort.set(Effort.MAX)
-    reportLevel.set(Confidence.MEDIUM)
-    showProgress.set(true)
-    excludeFilter.set(file("config/spotbugs/exclude.xml"))
-}
-
-pmd {
-    toolVersion = "7.10.0"
-    ruleSetFiles = files("config/pmd/ruleset.xml")
-    ruleSets = listOf()
-}
-
-tasks.named("pmdTest") {
-    enabled = false
 }
 
 tasks.jacocoTestReport {
@@ -165,22 +120,18 @@ tasks.jacocoTestCoverageVerification {
 }
 
 tasks.named("check") {
-    dependsOn(
-        tasks.jacocoTestCoverageVerification,
-        "spotbugsMain",
-        "spotbugsTest"
-    )
+    dependsOn(tasks.jacocoTestCoverageVerification)
 }
 
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
-            artifactId = "java-refined"
+            artifactId = "java-refined-kotlin"
 
             pom {
-                name.set("Java Refined")
-                description.set("Refinement and functional value types for Java 8+.")
+                name.set("Java Refined Kotlin Support")
+                description.set("Kotlin/JVM adapters and extensions for Java Refined.")
                 url.set(projectUrl)
                 inceptionYear.set("2026")
                 licenses {
@@ -212,6 +163,6 @@ publishing {
 
 tasks.named<Jar>("jar") {
     manifest {
-        attributes["Automatic-Module-Name"] = "io.github.junggikim.refined"
+        attributes["Automatic-Module-Name"] = "io.github.junggikim.refined.kotlin"
     }
 }

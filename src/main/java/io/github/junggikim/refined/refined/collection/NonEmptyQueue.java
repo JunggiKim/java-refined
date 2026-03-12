@@ -1,18 +1,20 @@
 package io.github.junggikim.refined.refined.collection;
 
+import java.util.AbstractList;
+import java.util.List;
+import java.util.stream.Stream;
 import io.github.junggikim.refined.core.RefinementException;
-import io.github.junggikim.refined.internal.AbstractRefined;
 import io.github.junggikim.refined.internal.RefinedSupport;
-import io.github.junggikim.refined.newtype.Newtype;
 import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
-import java.util.List;
 import java.util.Queue;
 
-public final class NonEmptyQueue<T> extends AbstractRefined<List<T>> implements Newtype<List<T>> {
+public final class NonEmptyQueue<T> extends AbstractList<T> implements Queue<T> {
 
-    private NonEmptyQueue(List<T> value) {
-        super(value);
+    private final List<T> elements;
+
+    private NonEmptyQueue(List<T> elements) {
+        this.elements = elements;
     }
 
     public static <T> Validation<Violation, NonEmptyQueue<T>> of(Queue<T> value) {
@@ -27,11 +29,54 @@ public final class NonEmptyQueue<T> extends AbstractRefined<List<T>> implements 
         throw new RefinementException(result.getError());
     }
 
+    public static <T> Validation<Violation, NonEmptyQueue<T>> ofStream(Stream<T> value) {
+        return RefinedSupport.nonEmptyQueueStreamSnapshot(value).map(snapshot -> new NonEmptyQueue<T>(snapshot));
+    }
+
+    public static <T> NonEmptyQueue<T> unsafeOfStream(Stream<T> value) {
+        Validation<Violation, NonEmptyQueue<T>> result = ofStream(value);
+        if (result.isValid()) {
+            return result.get();
+        }
+        throw new RefinementException(result.getError());
+    }
+
+    @Override
+    public T get(int index) {
+        return elements.get(index);
+    }
+
+    @Override
+    public int size() {
+        return elements.size();
+    }
+
+    @Override
+    public boolean offer(T value) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public T remove() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public T poll() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public T peek() {
-        return value().get(0);
+        return get(0);
+    }
+
+    @Override
+    public T element() {
+        return get(0);
     }
 
     public T last() {
-        return value().get(value().size() - 1);
+        return elements.get(elements.size() - 1);
     }
 }
