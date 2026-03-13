@@ -6,7 +6,6 @@
 ## Validation
 
 - [ ] `./gradlew clean check testJava8 jacocoTestReport`
-- [ ] `./gradlew prepareRelease` when release or publication flow changes
 
 ## Checklist
 

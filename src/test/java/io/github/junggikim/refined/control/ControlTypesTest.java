@@ -176,6 +176,13 @@ class ControlTypesTest {
         }
 
         @Test
+        void ofPropagatesErrorWithoutCapturing() {
+            assertThrows(StackOverflowError.class, () -> Try.of(() -> {
+                throw new StackOverflowError("test");
+            }));
+        }
+
+        @Test
         void tryImplementsEqualityHashCodeToStringAndNullGuards() {
             IOException boom = new IOException("boom");
             Try<Integer> success = Try.success(1);

@@ -5,7 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.1.0] - 2026-03-13
+
+### Security
+- JSON parser now enforces a maximum nesting depth of 512
+
+### Added
+- Maven Central deployment pipeline via `com.vanniktech.maven.publish` plugin
+- GitHub Actions release workflow triggered by version tags
+- PITest mutation testing with 95% kill threshold
+- Javadoc for `Try.of()` clarifying Error propagation behavior
+- Javadoc for `MatchesRegex` with ReDoS warning
+
+### Changed
+- Replaced `maven-publish` plugin with `com.vanniktech.maven.publish` v0.36.0
 
 ## [1.1.0] - 2026-03-12
 

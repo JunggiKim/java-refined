@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Until `1.0.0`, only the latest release line is considered supported for security fixes.
+Only the latest release line is considered supported for security fixes.
 
 ## Reporting a Vulnerability
 

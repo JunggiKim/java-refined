@@ -10,7 +10,7 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 
 plugins {
     `java-library`
-    `maven-publish`
+    id("com.vanniktech.maven.publish") version "0.36.0"
     jacoco
     checkstyle
     pmd
@@ -36,8 +36,7 @@ repositories {
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
-    withSourcesJar()
-    withJavadocJar()
+    // Sources and Javadoc JARs are created by the maven-publish plugin
 }
 
 dependencies {
@@ -119,6 +118,20 @@ tasks.named("pmdTest") {
     enabled = false
 }
 
+pitest {
+    junit5PluginVersion.set("1.2.1")
+    targetClasses.set(setOf("io.github.junggikim.refined.*"))
+    targetTests.set(setOf("io.github.junggikim.refined.*"))
+    threads.set(Runtime.getRuntime().availableProcessors())
+    outputFormats.set(setOf("XML", "HTML"))
+    timestampedReports.set(false)
+    mutationThreshold.set(95)
+    coverageThreshold.set(95)
+    mutators.set(setOf("DEFAULTS"))
+    failWhenNoMutations.set(true)
+    verbose.set(false)
+}
+
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
     reports {
@@ -185,40 +198,37 @@ tasks.named("check") {
     )
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
-            artifactId = "java-refined"
+mavenPublishing {
+    publishToMavenCentral(automaticRelease = true)
+    signAllPublications()
+    coordinates(groupId, "java-refined", libraryVersion)
 
-            pom {
-                name.set("Java Refined")
-                description.set("Refinement and functional value types for Java 8+.")
-                url.set(projectUrl)
-                inceptionYear.set("2026")
-                licenses {
-                    license {
-                        name.set("MIT License")
-                        url.set("https://opensource.org/licenses/MIT")
-                    }
-                }
-                developers {
-                    developer {
-                        id.set(developerId)
-                        name.set(developerName)
-                        url.set("https://github.com/JunggiKim")
-                    }
-                }
-                scm {
-                    connection.set("scm:git:https://github.com/JunggiKim/java-refined.git")
-                    developerConnection.set("scm:git:ssh://git@github.com/JunggiKim/java-refined.git")
-                    url.set(projectUrl)
-                }
-                issueManagement {
-                    system.set("GitHub Issues")
-                    url.set("$projectUrl/issues")
-                }
+    pom {
+        name.set("Java Refined")
+        description.set("Refinement and functional value types for Java 8+.")
+        url.set(projectUrl)
+        inceptionYear.set("2026")
+        licenses {
+            license {
+                name.set("MIT License")
+                url.set("https://opensource.org/licenses/MIT")
             }
+        }
+        developers {
+            developer {
+                id.set(developerId)
+                name.set(developerName)
+                url.set("https://github.com/JunggiKim")
+            }
+        }
+        scm {
+            connection.set("scm:git:https://github.com/JunggiKim/java-refined.git")
+            developerConnection.set("scm:git:ssh://git@github.com/JunggiKim/java-refined.git")
+            url.set(projectUrl)
+        }
+        issueManagement {
+            system.set("GitHub Issues")
+            url.set("$projectUrl/issues")
         }
     }
 }

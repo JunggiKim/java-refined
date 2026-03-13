@@ -1514,6 +1514,8 @@ public final class RefinedSupport {
         return sum % 10 == 0;
     }
 
+    private static final int JSON_MAX_NESTING_DEPTH = 512;
+
     private static boolean isValidJson(String value) {
         if (value.isEmpty()) {
             return false;
@@ -1523,14 +1525,17 @@ public final class RefinedSupport {
         if (pos[0] >= value.length()) {
             return false;
         }
-        if (!parseJsonValue(value, pos)) {
+        if (!parseJsonValue(value, pos, 0)) {
             return false;
         }
         skipWhitespace(value, pos);
         return pos[0] == value.length();
     }
 
-    private static boolean parseJsonValue(String json, int[] pos) {
+    private static boolean parseJsonValue(String json, int[] pos, int depth) {
+        if (depth > JSON_MAX_NESTING_DEPTH) {
+            return false;
+        }
         if (pos[0] >= json.length()) {
             return false;
         }
@@ -1539,10 +1544,10 @@ public final class RefinedSupport {
             return parseJsonString(json, pos);
         }
         if (ch == '{') {
-            return parseJsonObject(json, pos);
+            return parseJsonObject(json, pos, depth);
         }
         if (ch == '[') {
-            return parseJsonArray(json, pos);
+            return parseJsonArray(json, pos, depth);
         }
         if (ch == 't') {
             return parseJsonLiteral(json, pos, "true");
@@ -1559,7 +1564,7 @@ public final class RefinedSupport {
         return false;
     }
 
-    private static boolean parseJsonObject(String json, int[] pos) {
+    private static boolean parseJsonObject(String json, int[] pos, int depth) {
         pos[0]++;
         skipWhitespace(json, pos);
         if (pos[0] >= json.length()) {
@@ -1583,7 +1588,7 @@ public final class RefinedSupport {
             }
             pos[0]++;
             skipWhitespace(json, pos);
-            if (!parseJsonValue(json, pos)) {
+            if (!parseJsonValue(json, pos, depth + 1)) {
                 return false;
             }
             skipWhitespace(json, pos);
@@ -1601,7 +1606,7 @@ public final class RefinedSupport {
         }
     }
 
-    private static boolean parseJsonArray(String json, int[] pos) {
+    private static boolean parseJsonArray(String json, int[] pos, int depth) {
         pos[0]++;
         skipWhitespace(json, pos);
         if (pos[0] >= json.length()) {
@@ -1613,7 +1618,7 @@ public final class RefinedSupport {
         }
         while (true) {
             skipWhitespace(json, pos);
-            if (!parseJsonValue(json, pos)) {
+            if (!parseJsonValue(json, pos, depth + 1)) {
                 return false;
             }
             skipWhitespace(json, pos);

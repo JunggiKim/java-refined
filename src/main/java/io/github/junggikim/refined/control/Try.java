@@ -29,6 +29,10 @@ public interface Try<T> {
     /**
      * Evaluates a supplier and captures thrown exceptions as a failure.
      *
+     * <p>Only {@link Exception} and its subclasses are caught. {@link Error}
+     * subclasses such as {@link OutOfMemoryError} and {@link StackOverflowError}
+     * propagate unchanged and are never wrapped in a failure.</p>
+     *
      * @param supplier value supplier
      * @param <T> success type
      * @return success or failure
