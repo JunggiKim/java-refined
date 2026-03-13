@@ -41,8 +41,11 @@ jobs:
       - name: Verify build, quality gates, Java 8 compatibility, and coverage
         run: ./gradlew clean check testJava8 jacocoTestReport
 
-      - name: Generate documentation and local publication artifacts
-        run: ./gradlew javadoc generatePomFileForMavenJavaPublication publishToMavenLocal
+      - name: Run mutation testing
+        run: ./gradlew pitest
+
+      - name: Generate documentation
+        run: ./gradlew javadoc
 
       - name: Upload test and coverage reports
         if: always()
@@ -53,3 +56,4 @@ jobs:
             build/reports/tests/test
             build/reports/tests/testJava8
             build/reports/jacoco/test
+            build/reports/pitest

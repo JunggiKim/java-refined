@@ -323,4 +323,69 @@ class JsonStringEdgeCaseTest {
         assertEquals("json-string", JsonString.of("[1e ]").getError().code());
         assertEquals("json-string", JsonString.of("[1e+ ]").getError().code());
     }
+
+    @Test
+    void jsonStringRejectsDeeplyNestedArraysBeyondLimit() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 513; i++) {
+            sb.append('[');
+        }
+        sb.append("1");
+        for (int i = 0; i < 513; i++) {
+            sb.append(']');
+        }
+        assertEquals("json-string", JsonString.of(sb.toString()).getError().code());
+    }
+
+    @Test
+    void jsonStringRejectsDeeplyNestedObjectsBeyondLimit() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 513; i++) {
+            sb.append("{\"a\":");
+        }
+        sb.append("1");
+        for (int i = 0; i < 513; i++) {
+            sb.append('}');
+        }
+        assertEquals("json-string", JsonString.of(sb.toString()).getError().code());
+    }
+
+    @Test
+    void jsonStringAcceptsDeeplyNestedArraysWithinLimit() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 512; i++) {
+            sb.append('[');
+        }
+        sb.append("1");
+        for (int i = 0; i < 512; i++) {
+            sb.append(']');
+        }
+        assertTrue(JsonString.of(sb.toString()).isValid());
+    }
+
+    @Test
+    void jsonStringAcceptsDeeplyNestedObjectsWithinLimit() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 512; i++) {
+            sb.append("{\"a\":");
+        }
+        sb.append("1");
+        for (int i = 0; i < 512; i++) {
+            sb.append('}');
+        }
+        assertTrue(JsonString.of(sb.toString()).isValid());
+    }
+
+    @Test
+    void jsonStringRejectsMixedDeepNestingBeyondLimit() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 257; i++) {
+            sb.append("[{\"a\":");
+        }
+        sb.append("1");
+        for (int i = 0; i < 257; i++) {
+            sb.append("}]");
+        }
+        assertEquals("json-string", JsonString.of(sb.toString()).getError().code());
+    }
 }

@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/JunggiKim/java-refined/actions/workflows/ci.yml/badge.svg)](https://github.com/JunggiKim/java-refined/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)]()
+[![Mutation](https://img.shields.io/badge/mutation-95%25+-blue.svg)]()
 
 Java Refined is a Java 8+ library for refinement types, non-empty collections,
 and small functional control types. The core `java-refined` artifact has no
@@ -29,6 +31,9 @@ extensions and collection adapters, which adds a single runtime dependency on
 - non-empty collection wrappers with defensive snapshots
 - structured `Violation` errors with code/message/metadata
 - rich predicate catalog across numeric/string/collection/boolean/logical domains
+- 100% test coverage (JaCoCo: instruction, branch, line, complexity, method, class)
+- 95%+ mutation testing coverage (PITest)
+- JSON parser with nesting depth limit (512) for DoS protection
 
 ## Contents
 
@@ -69,32 +74,18 @@ object with `isValid()`, `get()`, `getError()`, or `fold(...)`.
 
 ## Installation
 
-This library is currently distributed via source checkout and local Maven builds only.
-From a source checkout, run `./gradlew publishToMavenLocal` and resolve the dependency through the local Maven repository.
+Add the dependency coordinates shown below to your build file.
+The library is published to Maven Central.
 
 ### Java Only
 
 Use only the core `java-refined` artifact when your codebase is Java-only.
-
-Local install checklist:
-
-1. Run `./gradlew publishToMavenLocal`.
-2. Add `mavenLocal()` to your repositories.
-3. Add `io.github.junggikim:java-refined:1.1.0`.
-
 The core module has no extra runtime dependencies beyond the JDK modules it already uses.
 
 ### Kotlin/JVM
 
 Add the optional `java-refined-kotlin` module only when you want Kotlin-first
 extensions and collection adapters on top of the Java core API.
-
-Local install checklist:
-
-1. Run `./gradlew publishToMavenLocal`.
-2. Add `mavenLocal()` and `mavenCentral()` to your repositories.
-3. Add both `java-refined` and `java-refined-kotlin`.
-
 The Kotlin support module adds one runtime dependency: `org.jetbrains.kotlin:kotlin-stdlib`.
 
 ## Coordinates
@@ -685,8 +676,10 @@ The full matrix is kept in [docs/type-matrix.md](docs/type-matrix.md).
 - verification:
   - `./gradlew clean check`
   - `./gradlew testJava8`
-  - `./gradlew javadoc generatePomFileForMavenJavaPublication publishToMavenLocal`
+  - `./gradlew javadoc`
+  - `./gradlew pitest`
 - Java 8 runtime compatibility is verified by the `testJava8` toolchain task
+- mutation testing is enforced with a 95% kill threshold via PITest
 - current build uses Java 8 source/target compatibility and Gradle `--release 8` when running on JDK 9+
 
 See [docs/compatibility.md](docs/compatibility.md) for Java version caveats.
