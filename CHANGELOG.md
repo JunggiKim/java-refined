@@ -7,6 +7,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+### Changed
+- Downgraded `com.vanniktech.maven.publish` from 0.36.0 to 0.35.0 for Kotlin 1.9.x compatibility
+
 ## [1.1.0] - 2026-03-13
 
 ### Security
