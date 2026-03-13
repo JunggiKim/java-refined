@@ -14,7 +14,7 @@ The verification pipeline covers:
 
 - `./gradlew clean check`
 - `./gradlew testJava8`
-- `./gradlew javadoc generatePomFileForMavenJavaPublication publishToMavenLocal`
+- `./gradlew javadoc`
 
 ## Notes
 

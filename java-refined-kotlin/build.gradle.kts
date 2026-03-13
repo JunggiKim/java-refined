@@ -5,9 +5,9 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.9.25"
+    kotlin("jvm")
     `java-library`
-    `maven-publish`
+    id("com.vanniktech.maven.publish") version "0.35.0"
     jacoco
 }
 
@@ -28,7 +28,6 @@ repositories {
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
-    withSourcesJar()
 }
 
 dependencies {
@@ -123,40 +122,36 @@ tasks.named("check") {
     dependsOn(tasks.jacocoTestCoverageVerification)
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
-            artifactId = "java-refined-kotlin"
-
-            pom {
-                name.set("Java Refined Kotlin Support")
-                description.set("Kotlin/JVM adapters and extensions for Java Refined.")
-                url.set(projectUrl)
-                inceptionYear.set("2026")
-                licenses {
-                    license {
-                        name.set("MIT License")
-                        url.set("https://opensource.org/licenses/MIT")
-                    }
-                }
-                developers {
-                    developer {
-                        id.set(developerId)
-                        name.set(developerName)
-                        url.set("https://github.com/JunggiKim")
-                    }
-                }
-                scm {
-                    connection.set("scm:git:https://github.com/JunggiKim/java-refined.git")
-                    developerConnection.set("scm:git:ssh://git@github.com/JunggiKim/java-refined.git")
-                    url.set(projectUrl)
-                }
-                issueManagement {
-                    system.set("GitHub Issues")
-                    url.set("$projectUrl/issues")
-                }
+mavenPublishing {
+    publishToMavenCentral(automaticRelease = true)
+    signAllPublications()
+    coordinates(groupId, "java-refined-kotlin", libraryVersion)
+    pom {
+        name.set("Java Refined Kotlin Support")
+        description.set("Kotlin/JVM adapters and extensions for Java Refined.")
+        url.set(projectUrl)
+        inceptionYear.set("2026")
+        licenses {
+            license {
+                name.set("MIT License")
+                url.set("https://opensource.org/licenses/MIT")
             }
+        }
+        developers {
+            developer {
+                id.set(developerId)
+                name.set(developerName)
+                url.set("https://github.com/JunggiKim")
+            }
+        }
+        scm {
+            connection.set("scm:git:git://github.com/JunggiKim/java-refined.git")
+            developerConnection.set("scm:git:ssh://github.com/JunggiKim/java-refined.git")
+            url.set(projectUrl)
+        }
+        issueManagement {
+            system.set("GitHub Issues")
+            url.set("$projectUrl/issues")
         }
     }
 }

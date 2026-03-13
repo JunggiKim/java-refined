@@ -105,7 +105,7 @@ Java only:
 
 ```kotlin
 repositories {
-    mavenLocal()
+    mavenCentral()
 }
 
 dependencies {
@@ -117,7 +117,6 @@ Kotlin/JVM:
 
 ```kotlin
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
@@ -133,7 +132,7 @@ Java only:
 
 ```groovy
 repositories {
-    mavenLocal()
+    mavenCentral()
 }
 
 dependencies {
@@ -145,7 +144,6 @@ Kotlin/JVM:
 
 ```groovy
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
@@ -182,7 +180,6 @@ Kotlin/JVM:
 </dependency>
 ```
 
-Ensure the artifacts have been published to the local Maven repository before resolving them.
 For Kotlin/JVM usage, keep access to Maven Central unless your build already provides `kotlin-stdlib`.
 
 ## Basic Usage
@@ -687,7 +684,7 @@ See [docs/compatibility.md](docs/compatibility.md) for Java version caveats.
 ## Project Status
 
 - current local version line: `1.1.0`
-- distribution: source checkout and local Maven only
+- distribution: Maven Central
 - release notes live in [CHANGELOG.md](CHANGELOG.md)
 
 ## Contributing and Security

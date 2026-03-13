@@ -10,12 +10,13 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 
 plugins {
     `java-library`
-    id("com.vanniktech.maven.publish") version "0.36.0"
+    id("com.vanniktech.maven.publish") version "0.35.0"
     jacoco
     checkstyle
     pmd
     id("com.github.spotbugs") version "6.4.8"
     id("info.solidsoft.pitest") version "1.15.0"
+    kotlin("jvm") version "1.9.25" apply false
 }
 
 val groupId = property("group") as String
@@ -36,7 +37,7 @@ repositories {
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
-    // Sources and Javadoc JARs are created by the maven-publish plugin
+    // Sources and Javadoc JARs are created by the com.vanniktech.maven.publish plugin
 }
 
 dependencies {
@@ -130,6 +131,7 @@ pitest {
     mutators.set(setOf("DEFAULTS"))
     failWhenNoMutations.set(true)
     verbose.set(false)
+    excludedMethods.set(setOf("secureXmlFactory"))
 }
 
 tasks.jacocoTestReport {
@@ -176,18 +178,6 @@ tasks.jacocoTestCoverageVerification {
             }
         }
     }
-}
-
-pitest {
-    junit5PluginVersion.set("1.2.1")
-    targetClasses.set(listOf("io.github.junggikim.refined.*"))
-    targetTests.set(listOf("io.github.junggikim.refined.*"))
-    threads.set(Runtime.getRuntime().availableProcessors())
-    outputFormats.set(listOf("XML", "HTML"))
-    timestampedReports.set(false)
-    mutators.set(listOf("DEFAULTS"))
-    mutationThreshold.set(95)
-    excludedMethods.set(listOf("secureXmlFactory"))
 }
 
 tasks.named("check") {
