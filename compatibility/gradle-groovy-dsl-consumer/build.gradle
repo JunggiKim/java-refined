@@ -1,0 +1,22 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+def refinedVersion = providers.gradleProperty('refinedVersion').orElse('1.1.0').get()
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation "io.github.junggikim:java-refined:${refinedVersion}"
+    implementation "io.github.junggikim:java-refined-kotlin:${refinedVersion}"
+
+    testImplementation "org.jetbrains.kotlin:kotlin-test"
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}
