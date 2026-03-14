@@ -1,0 +1,13 @@
+def consumerKotlinVersion = providers.gradleProperty('consumerKotlinVersion').orElse('1.9.25').get()
+
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+    plugins {
+        id 'org.jetbrains.kotlin.jvm' version consumerKotlinVersion
+    }
+}
+
+rootProject.name = 'java-refined-groovy-dsl-consumer'
