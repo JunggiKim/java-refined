@@ -33,6 +33,29 @@ public final class NonEmptyNavigableMap<K, V> extends AbstractMap<K, V> implemen
         throw new RefinementException(result.getError());
     }
 
+    public static <K extends Comparable<? super K>, V> Validation<Violation, NonEmptyNavigableMap<K, V>> of(
+        Stream<Map.Entry<K, V>> value
+    ) {
+        return ofEntryStream(value);
+    }
+
+    public static <K, V> Validation<Violation, NonEmptyNavigableMap<K, V>> of(
+        Stream<Map.Entry<K, V>> value,
+        Comparator<? super K> comparator
+    ) {
+        return ofEntryStream(value, comparator);
+    }
+
+    public static <K extends Comparable<? super K>, V> NonEmptyNavigableMap<K, V> unsafeOf(
+        Stream<Map.Entry<K, V>> value
+    ) {
+        return unsafeOfEntryStream(value);
+    }
+
+    public static <K, V> NonEmptyNavigableMap<K, V> unsafeOf(Stream<Map.Entry<K, V>> value, Comparator<? super K> comparator) {
+        return unsafeOfEntryStream(value, comparator);
+    }
+
     public static <K extends Comparable<? super K>, V> Validation<Violation, NonEmptyNavigableMap<K, V>> ofEntryStream(
         Stream<Map.Entry<K, V>> value
     ) {

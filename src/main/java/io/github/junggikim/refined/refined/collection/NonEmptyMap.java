@@ -29,6 +29,14 @@ public final class NonEmptyMap<K, V> extends AbstractMap<K, V> {
         throw new RefinementException(result.getError());
     }
 
+    public static <K, V> Validation<Violation, NonEmptyMap<K, V>> of(Stream<Map.Entry<K, V>> value) {
+        return ofEntryStream(value);
+    }
+
+    public static <K, V> NonEmptyMap<K, V> unsafeOf(Stream<Map.Entry<K, V>> value) {
+        return unsafeOfEntryStream(value);
+    }
+
     public static <K, V> Validation<Violation, NonEmptyMap<K, V>> ofEntryStream(
         Stream<Map.Entry<K, V>> value
     ) {

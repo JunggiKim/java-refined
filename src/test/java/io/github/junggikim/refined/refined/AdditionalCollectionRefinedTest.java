@@ -47,7 +47,7 @@ class AdditionalCollectionRefinedTest {
         assertEquals(listOf(1, 2, 3), queue);
         assertEquals(listOf(1, 2, 3).hashCode(), queue.hashCode());
         assertEquals("non-empty-queue-empty", NonEmptyQueue.<Integer>of(new ArrayDeque<>()).getError().code());
-        assertEquals("non-empty-queue-empty", NonEmptyQueue.<Integer>of(null).getError().code());
+        assertEquals("non-empty-queue-empty", NonEmptyQueue.<Integer>of((Queue<Integer>) null).getError().code());
         assertThrows(RefinementException.class, () -> NonEmptyQueue.unsafeOf(new ArrayDeque<Integer>()));
         assertThrows(UnsupportedOperationException.class, () -> queueView.offer(99));
         assertThrows(UnsupportedOperationException.class, () -> queueView.remove());
@@ -83,7 +83,7 @@ class AdditionalCollectionRefinedTest {
         assertEquals(listOf(2, 3), snapshot(naturalSet.tailSet(2)));
         assertEquals(listOf(1, 2), snapshot(naturalSet.subSet(1, 3)));
         assertEquals("non-empty-sorted-set-empty", NonEmptySortedSet.<Integer>of(new TreeSet<Integer>()).getError().code());
-        assertEquals("non-empty-sorted-set-empty", NonEmptySortedSet.<Integer>of(null).getError().code());
+        assertEquals("non-empty-sorted-set-empty", NonEmptySortedSet.<Integer>of((SortedSet<Integer>) null).getError().code());
         assertThrows(RefinementException.class, () -> NonEmptySortedSet.unsafeOf(new TreeSet<Integer>()));
         assertThrows(UnsupportedOperationException.class, () -> sortedSet.add(99));
         assertThrows(UnsupportedOperationException.class, () -> naturalSet.headSet(3).add(0));
@@ -113,7 +113,7 @@ class AdditionalCollectionRefinedTest {
         assertEquals(listOf(2, 3), snapshot(naturalMap.tailMap(2).keySet()));
         assertEquals(listOf(1, 2), snapshot(naturalMap.subMap(1, 3).keySet()));
         assertEquals("non-empty-sorted-map-empty", NonEmptySortedMap.<Integer, String>of(new TreeMap<Integer, String>()).getError().code());
-        assertEquals("non-empty-sorted-map-empty", NonEmptySortedMap.<Integer, String>of(null).getError().code());
+        assertEquals("non-empty-sorted-map-empty", NonEmptySortedMap.<Integer, String>of((SortedMap<Integer, String>) null).getError().code());
         assertThrows(RefinementException.class, () -> NonEmptySortedMap.unsafeOf(new TreeMap<Integer, String>()));
         assertThrows(UnsupportedOperationException.class, () -> sortedMap.put(99, "boom"));
         assertThrows(UnsupportedOperationException.class, () -> naturalMap.headMap(3).put(0, "zero"));
@@ -159,7 +159,10 @@ class AdditionalCollectionRefinedTest {
         assertEquals(listOf(3, 2, 1), snapshot(NonEmptyNavigableSet.of(reverse).get()));
         assertEquals(Collections.reverseOrder(), NonEmptyNavigableSet.of(reverse).get().comparator());
         assertEquals("non-empty-navigable-set-empty", NonEmptyNavigableSet.<Integer>of(new TreeSet<Integer>()).getError().code());
-        assertEquals("non-empty-navigable-set-empty", NonEmptyNavigableSet.<Integer>of(null).getError().code());
+        assertEquals(
+            "non-empty-navigable-set-empty",
+            NonEmptyNavigableSet.<Integer>of((NavigableSet<Integer>) null).getError().code()
+        );
         assertThrows(RefinementException.class, () -> NonEmptyNavigableSet.unsafeOf(new TreeSet<Integer>()));
         assertThrows(UnsupportedOperationException.class, () -> navigableSet.add(99));
         assertThrows(UnsupportedOperationException.class, () -> navigableSet.pollFirst());
@@ -212,7 +215,10 @@ class AdditionalCollectionRefinedTest {
         assertEquals(listOf(3, 2, 1), snapshot(NonEmptyNavigableMap.of(reverse).get().keySet()));
         assertEquals(Collections.reverseOrder(), NonEmptyNavigableMap.of(reverse).get().comparator());
         assertEquals("non-empty-navigable-map-empty", NonEmptyNavigableMap.<Integer, String>of(new TreeMap<Integer, String>()).getError().code());
-        assertEquals("non-empty-navigable-map-empty", NonEmptyNavigableMap.<Integer, String>of(null).getError().code());
+        assertEquals(
+            "non-empty-navigable-map-empty",
+            NonEmptyNavigableMap.<Integer, String>of((NavigableMap<Integer, String>) null).getError().code()
+        );
         assertThrows(RefinementException.class, () -> NonEmptyNavigableMap.unsafeOf(new TreeMap<Integer, String>()));
         assertThrows(UnsupportedOperationException.class, () -> navigableMap.put(99, "boom"));
         assertThrows(UnsupportedOperationException.class, () -> navigableMap.pollFirstEntry());

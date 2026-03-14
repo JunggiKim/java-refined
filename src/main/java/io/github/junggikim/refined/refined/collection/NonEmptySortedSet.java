@@ -30,6 +30,22 @@ public final class NonEmptySortedSet<T> extends AbstractSet<T> implements Sorted
         throw new RefinementException(result.getError());
     }
 
+    public static <T extends Comparable<? super T>> Validation<Violation, NonEmptySortedSet<T>> of(Stream<T> value) {
+        return ofStream(value);
+    }
+
+    public static <T> Validation<Violation, NonEmptySortedSet<T>> of(Stream<T> value, Comparator<? super T> comparator) {
+        return ofStream(value, comparator);
+    }
+
+    public static <T extends Comparable<? super T>> NonEmptySortedSet<T> unsafeOf(Stream<T> value) {
+        return unsafeOfStream(value);
+    }
+
+    public static <T> NonEmptySortedSet<T> unsafeOf(Stream<T> value, Comparator<? super T> comparator) {
+        return unsafeOfStream(value, comparator);
+    }
+
     public static <T extends Comparable<? super T>> Validation<Violation, NonEmptySortedSet<T>> ofStream(
         Stream<T> value
     ) {
