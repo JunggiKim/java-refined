@@ -2,8 +2,9 @@
 
 [![CI](https://github.com/JunggiKim/java-refined/actions/workflows/ci.yml/badge.svg)](https://github.com/JunggiKim/java-refined/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)]()
-[![Mutation](https://img.shields.io/badge/mutation-95%25+-blue.svg)]()
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.junggikim/java-refined)](https://central.sonatype.com/artifact/io.github.junggikim/java-refined)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://github.com/JunggiKim/java-refined/actions)
+[![Mutation](https://img.shields.io/badge/mutation-95%25+-blue.svg)](https://github.com/JunggiKim/java-refined/actions)
 
 Java Refined is a Java 8+ library for refinement types, non-empty collections,
 and small functional control types. The core `java-refined` artifact has no
@@ -683,7 +684,7 @@ See [docs/compatibility.md](docs/compatibility.md) for Java version caveats.
 
 ## Project Status
 
-- current local version line: `1.1.0`
+- current version: `1.1.0`
 - distribution: Maven Central
 - release notes live in [CHANGELOG.md](CHANGELOG.md)
 
