@@ -29,6 +29,14 @@ public final class NonEmptySet<T> extends AbstractSet<T> {
         throw new RefinementException(result.getError());
     }
 
+    public static <T> Validation<Violation, NonEmptySet<T>> of(Stream<T> value) {
+        return ofStream(value);
+    }
+
+    public static <T> NonEmptySet<T> unsafeOf(Stream<T> value) {
+        return unsafeOfStream(value);
+    }
+
     public static <T> Validation<Violation, NonEmptySet<T>> ofStream(Stream<T> value) {
         return RefinedSupport.nonEmptySetStreamSnapshot(value).map(snapshot -> new NonEmptySet<T>(snapshot));
     }

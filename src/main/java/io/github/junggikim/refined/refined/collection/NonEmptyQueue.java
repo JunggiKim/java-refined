@@ -29,6 +29,14 @@ public final class NonEmptyQueue<T> extends AbstractList<T> implements Queue<T> 
         throw new RefinementException(result.getError());
     }
 
+    public static <T> Validation<Violation, NonEmptyQueue<T>> of(Stream<T> value) {
+        return ofStream(value);
+    }
+
+    public static <T> NonEmptyQueue<T> unsafeOf(Stream<T> value) {
+        return unsafeOfStream(value);
+    }
+
     public static <T> Validation<Violation, NonEmptyQueue<T>> ofStream(Stream<T> value) {
         return RefinedSupport.nonEmptyQueueStreamSnapshot(value).map(snapshot -> new NonEmptyQueue<T>(snapshot));
     }

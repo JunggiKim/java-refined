@@ -53,6 +53,18 @@ class StreamCollectionRefinedTest {
         assertEquals(listOf("x", "y"), NonEmptyQueue.ofStream(Stream.of("x", "y")).get());
         assertEquals(listOf("x", "y"), NonEmptyDeque.ofStream(Stream.of("x", "y")).get());
         assertEquals(listOf("x", "y"), NonEmptyIterable.ofStream(Stream.of("x", "y")).get());
+
+        assertEquals(listOf("m", "n"), NonEmptyList.of(Stream.of("m", "n")).get());
+        assertEquals(setOf("m", "n"), NonEmptySet.of(Stream.of("m", "n")).get());
+        assertEquals(listOf("m", "n"), NonEmptyQueue.of(Stream.of("m", "n")).get());
+        assertEquals(listOf("m", "n"), NonEmptyDeque.of(Stream.of("m", "n")).get());
+        assertEquals(listOf("m", "n"), NonEmptyIterable.of(Stream.of("m", "n")).get());
+
+        assertEquals(listOf("p", "q"), NonEmptyList.unsafeOf(Stream.of("p", "q")));
+        assertEquals(setOf("p", "q"), NonEmptySet.unsafeOf(Stream.of("p", "q")));
+        assertEquals(listOf("p", "q"), NonEmptyQueue.unsafeOf(Stream.of("p", "q")));
+        assertEquals(listOf("p", "q"), NonEmptyDeque.unsafeOf(Stream.of("p", "q")));
+        assertEquals(listOf("p", "q"), NonEmptyIterable.unsafeOf(Stream.of("p", "q")));
     }
 
     @Test
@@ -68,6 +80,11 @@ class StreamCollectionRefinedTest {
         assertEquals("non-empty-queue-empty", NonEmptyQueue.ofStream(Stream.<Integer>empty()).getError().code());
         assertEquals("non-empty-deque-empty", NonEmptyDeque.ofStream(Stream.<Integer>empty()).getError().code());
         assertEquals("non-empty-iterable-empty", NonEmptyIterable.ofStream(Stream.<Integer>empty()).getError().code());
+        assertEquals("non-empty-list-empty", NonEmptyList.of(Stream.<Integer>empty()).getError().code());
+        assertEquals("non-empty-set-empty", NonEmptySet.of(Stream.<Integer>empty()).getError().code());
+        assertEquals("non-empty-queue-empty", NonEmptyQueue.of(Stream.<Integer>empty()).getError().code());
+        assertEquals("non-empty-deque-empty", NonEmptyDeque.of(Stream.<Integer>empty()).getError().code());
+        assertEquals("non-empty-iterable-empty", NonEmptyIterable.of(Stream.<Integer>empty()).getError().code());
 
         assertEquals("non-empty-list-null-element", NonEmptyList.ofStream(Stream.of(1, null)).getError().code());
         assertEquals("non-empty-set-null-element", NonEmptySet.ofStream(Stream.of(1, null)).getError().code());
@@ -116,6 +133,7 @@ class StreamCollectionRefinedTest {
         assertEquals(listOf(2, 1), snapshot(reverseNavigableMap.keySet()));
 
         assertEquals(mapOf("x", 1), NonEmptyMap.ofEntryStream(entryStream("x", 1)).get());
+        assertEquals(mapOf("x", 1), NonEmptyMap.of(entryStream("x", 1)).get());
         assertEquals(
             listOf(1),
             snapshot(NonEmptySortedMap.ofEntryStream(StreamCollectionRefinedTest.<Integer, String>entryStream(1, "one")).get().keySet())
@@ -126,11 +144,51 @@ class StreamCollectionRefinedTest {
         );
         assertEquals(
             listOf(1),
+            snapshot(NonEmptySortedMap.of(StreamCollectionRefinedTest.<Integer, String>entryStream(1, "one")).get().keySet())
+        );
+        assertEquals(
+            listOf(1),
+            snapshot(NonEmptySortedMap.of(entryStream(1, "one"), Collections.<Integer>reverseOrder()).get().keySet())
+        );
+        assertEquals(
+            listOf(1),
             snapshot(NonEmptyNavigableMap.ofEntryStream(StreamCollectionRefinedTest.<Integer, String>entryStream(1, "one")).get().keySet())
         );
         assertEquals(
             listOf(1),
             snapshot(NonEmptyNavigableMap.ofEntryStream(entryStream(1, "one"), Collections.<Integer>reverseOrder()).get().keySet())
+        );
+        assertEquals(
+            listOf(1),
+            snapshot(NonEmptyNavigableMap.of(StreamCollectionRefinedTest.<Integer, String>entryStream(1, "one")).get().keySet())
+        );
+        assertEquals(
+            listOf(1),
+            snapshot(NonEmptyNavigableMap.of(entryStream(1, "one"), Collections.<Integer>reverseOrder()).get().keySet())
+        );
+
+        assertEquals(mapOf("z", 9), NonEmptyMap.unsafeOf(entryStream("z", 9)));
+        assertEquals(
+            listOf(1),
+            snapshot(NonEmptySortedMap.unsafeOf(StreamCollectionRefinedTest.<Integer, String>entryStream(1, "one")).keySet())
+        );
+        assertEquals(
+            listOf(1),
+            snapshot(
+                NonEmptySortedMap.unsafeOf(StreamCollectionRefinedTest.<Integer, String>entryStream(1, "one"),
+                    Collections.<Integer>reverseOrder()).keySet()
+            )
+        );
+        assertEquals(
+            listOf(1),
+            snapshot(NonEmptyNavigableMap.unsafeOf(StreamCollectionRefinedTest.<Integer, String>entryStream(1, "one")).keySet())
+        );
+        assertEquals(
+            listOf(1),
+            snapshot(
+                NonEmptyNavigableMap.unsafeOf(StreamCollectionRefinedTest.<Integer, String>entryStream(1, "one"),
+                    Collections.<Integer>reverseOrder()).keySet()
+            )
         );
     }
 
@@ -153,6 +211,12 @@ class StreamCollectionRefinedTest {
         assertEquals(
             "non-empty-navigable-map-empty",
             NonEmptyNavigableMap.ofEntryStream(Stream.<Map.Entry<Integer, String>>empty()).getError().code()
+        );
+        assertEquals("non-empty-map-empty", NonEmptyMap.of(Stream.<Map.Entry<String, Integer>>empty()).getError().code());
+        assertEquals("non-empty-sorted-map-empty", NonEmptySortedMap.of(Stream.<Map.Entry<Integer, String>>empty()).getError().code());
+        assertEquals(
+            "non-empty-navigable-map-empty",
+            NonEmptyNavigableMap.of(Stream.<Map.Entry<Integer, String>>empty()).getError().code()
         );
 
         assertEquals("non-empty-map-null-key", NonEmptyMap.ofEntryStream(Stream.of(entry(null, 1))).getError().code());
@@ -216,6 +280,16 @@ class StreamCollectionRefinedTest {
         assertEquals(listOf(1), snapshot(NonEmptySortedSet.ofStream(Stream.of(1), Collections.<Integer>reverseOrder()).get()));
         assertEquals(listOf(1), snapshot(NonEmptyNavigableSet.ofStream(Stream.of(1)).get()));
         assertEquals(listOf(1), snapshot(NonEmptyNavigableSet.ofStream(Stream.of(1), Collections.<Integer>reverseOrder()).get()));
+
+        assertEquals(listOf(1), snapshot(NonEmptySortedSet.of(Stream.of(1)).get()));
+        assertEquals(listOf(1), snapshot(NonEmptySortedSet.of(Stream.of(1), Collections.<Integer>reverseOrder()).get()));
+        assertEquals(listOf(1), snapshot(NonEmptyNavigableSet.of(Stream.of(1)).get()));
+        assertEquals(listOf(1), snapshot(NonEmptyNavigableSet.of(Stream.of(1), Collections.<Integer>reverseOrder()).get()));
+
+        assertEquals(listOf(1), snapshot(NonEmptySortedSet.unsafeOf(Stream.of(1))));
+        assertEquals(listOf(1), snapshot(NonEmptySortedSet.unsafeOf(Stream.of(1), Collections.<Integer>reverseOrder())));
+        assertEquals(listOf(1), snapshot(NonEmptyNavigableSet.unsafeOf(Stream.of(1))));
+        assertEquals(listOf(1), snapshot(NonEmptyNavigableSet.unsafeOf(Stream.of(1), Collections.<Integer>reverseOrder())));
     }
 
     @Test
@@ -235,6 +309,11 @@ class StreamCollectionRefinedTest {
         assertEquals(
             "non-empty-navigable-set-empty",
             NonEmptyNavigableSet.ofStream(Stream.<Integer>empty()).getError().code()
+        );
+        assertEquals("non-empty-sorted-set-empty", NonEmptySortedSet.of(Stream.<Integer>empty()).getError().code());
+        assertEquals(
+            "non-empty-navigable-set-empty",
+            NonEmptyNavigableSet.of(Stream.<Integer>empty()).getError().code()
         );
 
         assertEquals("non-empty-sorted-set-null-element", NonEmptySortedSet.ofStream(Stream.of(1, null)).getError().code());

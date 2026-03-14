@@ -28,6 +28,14 @@ public final class NonEmptyList<T> extends AbstractList<T> {
         throw new RefinementException(result.getError());
     }
 
+    public static <T> Validation<Violation, NonEmptyList<T>> of(Stream<T> value) {
+        return ofStream(value);
+    }
+
+    public static <T> NonEmptyList<T> unsafeOf(Stream<T> value) {
+        return unsafeOfStream(value);
+    }
+
     public static <T> Validation<Violation, NonEmptyList<T>> ofStream(Stream<T> value) {
         return RefinedSupport.nonEmptyListStreamSnapshot(value).map(snapshot -> new NonEmptyList<T>(snapshot));
     }

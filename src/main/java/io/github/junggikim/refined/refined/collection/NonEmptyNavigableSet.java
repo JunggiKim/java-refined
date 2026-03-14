@@ -31,6 +31,22 @@ public final class NonEmptyNavigableSet<T> extends AbstractSet<T> implements Nav
         throw new RefinementException(result.getError());
     }
 
+    public static <T extends Comparable<? super T>> Validation<Violation, NonEmptyNavigableSet<T>> of(Stream<T> value) {
+        return ofStream(value);
+    }
+
+    public static <T> Validation<Violation, NonEmptyNavigableSet<T>> of(Stream<T> value, Comparator<? super T> comparator) {
+        return ofStream(value, comparator);
+    }
+
+    public static <T extends Comparable<? super T>> NonEmptyNavigableSet<T> unsafeOf(Stream<T> value) {
+        return unsafeOfStream(value);
+    }
+
+    public static <T> NonEmptyNavigableSet<T> unsafeOf(Stream<T> value, Comparator<? super T> comparator) {
+        return unsafeOfStream(value, comparator);
+    }
+
     public static <T extends Comparable<? super T>> Validation<Violation, NonEmptyNavigableSet<T>> ofStream(
         Stream<T> value
     ) {

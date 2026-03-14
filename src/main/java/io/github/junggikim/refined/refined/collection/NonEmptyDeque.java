@@ -31,6 +31,14 @@ public final class NonEmptyDeque<T> extends AbstractList<T> implements Deque<T> 
         throw new RefinementException(result.getError());
     }
 
+    public static <T> Validation<Violation, NonEmptyDeque<T>> of(Stream<T> value) {
+        return ofStream(value);
+    }
+
+    public static <T> NonEmptyDeque<T> unsafeOf(Stream<T> value) {
+        return unsafeOfStream(value);
+    }
+
     public static <T> Validation<Violation, NonEmptyDeque<T>> ofStream(Stream<T> value) {
         return RefinedSupport.nonEmptyDequeStreamSnapshot(value).map(snapshot -> new NonEmptyDeque<T>(snapshot));
     }

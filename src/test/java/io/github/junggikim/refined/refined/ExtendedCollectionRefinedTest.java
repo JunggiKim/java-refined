@@ -42,7 +42,7 @@ class ExtendedCollectionRefinedTest {
         assertEquals(1, dequeView.peek());
         assertEquals(listOf(3, 2, 1), reversed);
         assertEquals("non-empty-deque-empty", NonEmptyDeque.<Integer>of(new ArrayDeque<Integer>()).getError().code());
-        assertEquals("non-empty-deque-empty", NonEmptyDeque.<Integer>of(null).getError().code());
+        assertEquals("non-empty-deque-empty", NonEmptyDeque.<Integer>of((Deque<Integer>) null).getError().code());
         assertThrows(RefinementException.class, () -> NonEmptyDeque.unsafeOf(new ArrayDeque<Integer>()));
         assertThrows(UnsupportedOperationException.class, () -> dequeView.addFirst(99));
         assertThrows(UnsupportedOperationException.class, () -> dequeView.addLast(99));
@@ -79,7 +79,7 @@ class ExtendedCollectionRefinedTest {
         assertEquals(5, iterable.get(1));
         assertEquals(listOf(4, 5, 6), NonEmptyIterable.of(source).get());
         assertEquals("non-empty-iterable-empty", NonEmptyIterable.<Integer>of(listOf()).getError().code());
-        assertEquals("non-empty-iterable-empty", NonEmptyIterable.<Integer>of(null).getError().code());
+        assertEquals("non-empty-iterable-empty", NonEmptyIterable.<Integer>of((Iterable<Integer>) null).getError().code());
         assertThrows(RefinementException.class, () -> NonEmptyIterable.unsafeOf(listOf()));
         assertEquals(4, iterator.next());
         assertThrows(UnsupportedOperationException.class, () -> iterator.remove());

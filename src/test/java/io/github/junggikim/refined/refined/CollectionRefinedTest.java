@@ -60,7 +60,7 @@ class CollectionRefinedTest {
     @Test
     void nonEmptyListRejectsEmptyAndBehavesAsImmutableList() {
         assertEquals("non-empty-list-empty", NonEmptyList.of(listOf()).getError().code());
-        assertEquals("non-empty-list-empty", NonEmptyList.<Integer>of(null).getError().code());
+        assertEquals("non-empty-list-empty", NonEmptyList.<Integer>of((List<Integer>) null).getError().code());
         assertEquals(mapOf("containerKind", "list", "cause", "empty"), NonEmptyList.of(listOf()).getError().metadata());
         assertThrows(RefinementException.class, () -> NonEmptyList.unsafeOf(listOf()));
 
@@ -91,8 +91,8 @@ class CollectionRefinedTest {
     void nonEmptySetAndMapRejectEmptyAndAreImmutable() {
         assertEquals("non-empty-set-empty", NonEmptySet.of(setOf()).getError().code());
         assertEquals("non-empty-map-empty", NonEmptyMap.of(mapOf()).getError().code());
-        assertEquals("non-empty-set-empty", NonEmptySet.<Integer>of(null).getError().code());
-        assertEquals("non-empty-map-empty", NonEmptyMap.<String, Integer>of(null).getError().code());
+        assertEquals("non-empty-set-empty", NonEmptySet.<Integer>of((Set<Integer>) null).getError().code());
+        assertEquals("non-empty-map-empty", NonEmptyMap.<String, Integer>of((Map<String, Integer>) null).getError().code());
         assertEquals(mapOf("containerKind", "set", "cause", "empty"), NonEmptySet.of(setOf()).getError().metadata());
         assertEquals(mapOf("containerKind", "map", "cause", "empty"), NonEmptyMap.of(mapOf()).getError().metadata());
         assertThrows(RefinementException.class, () -> NonEmptySet.unsafeOf(setOf()));

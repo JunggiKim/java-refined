@@ -269,6 +269,8 @@ the same core refined wrappers and validation model.
 
 ## Error Handling
 
+`Validation` is fail-fast (stops at the first error), while `Validated` accumulates multiple errors.
+
 ```java
 import io.github.junggikim.refined.refined.string.NonBlankString;
 import io.github.junggikim.refined.validation.Validated;
@@ -295,6 +297,9 @@ Refined wrappers expose two factory methods:
 - `of(value)` returns `Validation<Violation, T>` and never throws.
 - `unsafeOf(value)` throws `RefinementException` on invalid input.
 
+Refined wrappers do not expose public constructors, so creation always goes through `of(...)` or `unsafeOf(...)`.
+Use `unsafeOf(...)` only at trusted boundaries after validation has already happened.
+
 `Validation` is fail-fast and stops at the first error. `Validated` accumulates multiple errors into a non-empty list.
 
 For scalar wrappers such as `PositiveInt` or `NonBlankString`, the refined object
@@ -303,6 +308,7 @@ stores the validated runtime value and exposes it through `value()`.
 For collection wrappers such as `NonEmptyList` or `NonEmptyMap`, the refined object
 is itself the collection interface. It preserves the non-empty invariant and immutable
 snapshot semantics while remaining directly usable as a JDK collection.
+Mutator methods such as `add`, `remove`, `put`, `offer`, or `poll` are not supported and throw.
 
 ## Core API
 
