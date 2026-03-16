@@ -6,66 +6,9 @@
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://github.com/JunggiKim/java-refined/actions)
 [![Mutation](https://img.shields.io/badge/mutation-95%25+-blue.svg)](https://github.com/JunggiKim/java-refined/actions)
 
-Java Refined is a Java 8+ library for refinement types, non-empty collections,
-and small functional control types. The core `java-refined` artifact has no
-runtime dependencies, and the optional `java-refined-kotlin` artifact adds a
-single Kotlin runtime dependency on `kotlin-stdlib`.
+Move validation into the type system. Zero runtime dependencies. Java 8+.
 
-It lets you move validation out of scattered `if` checks and into explicit
-types such as `PositiveInt`, `NonBlankString`, and `NonEmptyList`.
-
-This project is open source under the MIT license, so you can use, modify, and
-distribute it in personal or commercial codebases.
-
-Java-only projects can use `java-refined` with no runtime dependencies.
-Kotlin/JVM projects can optionally add `java-refined-kotlin` for Kotlin-first
-extensions and collection adapters, which adds a single runtime dependency on
-`org.jetbrains.kotlin:kotlin-stdlib`.
-
-## Features
-
-- zero runtime dependencies in the core `java-refined` module
-- optional Kotlin/JVM support module with Kotlin-first extensions and one `kotlin-stdlib` runtime dependency
-- Java 8 bytecode baseline with Java 8+ APIs
-- refined wrappers with safe `of` and throwing `unsafeOf` constructors
-- fail-fast `Validation` and error-accumulating `Validated`
-- non-empty collection wrappers with defensive snapshots
-- structured `Violation` errors with code/message/metadata
-- rich predicate catalog across numeric/string/collection/boolean/logical domains
-- 100% test coverage (JaCoCo: instruction, branch, line, complexity, method, class)
-- 95%+ mutation testing coverage (PITest)
-- JSON parser with nesting depth limit (512) for DoS protection
-
-## Contents
-
-- [Why](#why)
-- [Terminology](#terminology)
-- [Installation](#installation)
-- [Coordinates](#coordinates)
-- [Basic Usage](#basic-usage)
-- [Kotlin/JVM Usage](#kotlinjvm-usage)
-- [Error Handling](#error-handling)
-- [Core Concepts](#core-concepts)
-- [Core API](#core-api)
-- [Supported Types](#supported-types)
-- [Compatibility](#compatibility)
-- [Project Status](#project-status)
-- [Contributing and Security](#contributing-and-security)
-- [License](#license)
-
-## Why
-
-Java applications often validate the same invariants repeatedly:
-
-- positive numeric identifiers
-- non-blank names and codes
-- non-empty collections in domain logic
-- fail-fast versus error-accumulating validation
-
-Java Refined packages those invariants into reusable types and predicates so
-that "already validated" becomes part of the type system at the library level.
-
-### Before
+## Before
 
 ```java
 public void createUser(String name, int age, List<String> roles) {
@@ -82,7 +25,7 @@ public void createUser(String name, int age, List<String> roles) {
 }
 ```
 
-### After
+## After
 
 ```java
 public void createUser(NonBlankString name, PositiveInt age, NonEmptyList<String> roles) {
@@ -92,99 +35,23 @@ public void createUser(NonBlankString name, PositiveInt age, NonEmptyList<String
 
 Types replace scattered `if`-checks. Invalid data cannot even reach your method.
 
-## Terminology
-
-Validation means "a validation result". It contains either a valid value or an error.
-Violation means "a rule was broken". It carries a code, message, and optional metadata.
-
-You do not need functional programming to use this. Treat `Validation` as a result
-object with `isValid()`, `get()`, `getError()`, or `fold(...)`.
-
 ## Installation
 
-Add the dependency coordinates shown below to your build file.
-The library is published to Maven Central.
-
-### Java Only
-
-Use only the core `java-refined` artifact when your codebase is Java-only.
-The core module has no extra runtime dependencies beyond the JDK modules it already uses.
-
-### Kotlin/JVM
-
-Add the optional `java-refined-kotlin` module only when you want Kotlin-first
-extensions and collection adapters on top of the Java core API.
-The Kotlin support module adds one runtime dependency: `org.jetbrains.kotlin:kotlin-stdlib`.
-
-## Coordinates
-
-```text
-Java only:
-io.github.junggikim:java-refined:1.1.0
-
-Kotlin/JVM:
-io.github.junggikim:java-refined:1.1.0
-io.github.junggikim:java-refined-kotlin:1.1.0
-```
+Published to [Maven Central](https://central.sonatype.com/artifact/io.github.junggikim/java-refined). Kotlin/JVM users can optionally add `java-refined-kotlin` for extension functions (adds `kotlin-stdlib` dependency).
 
 ### Gradle Kotlin DSL
 
-Java only:
-
 ```kotlin
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     implementation("io.github.junggikim:java-refined:1.1.0")
-}
-```
 
-Kotlin/JVM:
-
-```kotlin
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation("io.github.junggikim:java-refined:1.1.0")
-    implementation("io.github.junggikim:java-refined-kotlin:1.1.0")
-}
-```
-
-### Gradle Groovy DSL
-
-Java only:
-
-```groovy
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation 'io.github.junggikim:java-refined:1.1.0'
-}
-```
-
-Kotlin/JVM:
-
-```groovy
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation 'io.github.junggikim:java-refined:1.1.0'
-    implementation 'io.github.junggikim:java-refined-kotlin:1.1.0'
+    // optional: Kotlin extensions
+    // implementation("io.github.junggikim:java-refined-kotlin:1.1.0")
 }
 ```
 
 ### Maven
 
-Java only:
-
 ```xml
 <dependency>
   <groupId>io.github.junggikim</groupId>
@@ -193,540 +60,89 @@ Java only:
 </dependency>
 ```
 
-Kotlin/JVM:
-
-```xml
-<dependency>
-  <groupId>io.github.junggikim</groupId>
-  <artifactId>java-refined</artifactId>
-  <version>1.1.0</version>
-</dependency>
-<dependency>
-  <groupId>io.github.junggikim</groupId>
-  <artifactId>java-refined-kotlin</artifactId>
-  <version>1.1.0</version>
-</dependency>
-```
-
-For Kotlin/JVM usage, keep access to Maven Central unless your build already provides `kotlin-stdlib`.
-
-## Basic Usage
+## Quick Start
 
 ```java
-import io.github.junggikim.refined.refined.collection.NonEmptyList;
 import io.github.junggikim.refined.refined.numeric.PositiveInt;
 import io.github.junggikim.refined.refined.string.NonBlankString;
+import io.github.junggikim.refined.refined.collection.NonEmptyList;
 import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 import java.util.Arrays;
 
+// of() returns Validation — never throws
 Validation<Violation, PositiveInt> age = PositiveInt.of(18);
 Validation<Violation, NonBlankString> name = NonBlankString.of("Ada");
-Validation<Violation, NonEmptyList<String>> tags = NonEmptyList.of(Arrays.asList("java", "fp"));
+Validation<Violation, NonEmptyList<String>> tags =
+    NonEmptyList.of(Arrays.asList("java", "fp"));  // or List.of() on Java 9+
 
+// combine results
 Validation<Violation, String> summary =
     name.zip(age, (n, a) -> n.value() + " (" + a.value() + ")");
 
-boolean hasJavaTag = tags.get().contains("java");
-Validation<Violation, NonEmptyList<String>> upperTags =
-    NonEmptyList.ofStream(tags.get().stream().map(String::toUpperCase));
+// unsafeOf() throws on invalid input — use at trusted boundaries
+PositiveInt confirmedAge = PositiveInt.unsafeOf(18);
 ```
 
-Refined wrappers are created through factory methods, not public constructors.
-Use `of(...)` when invalid input is part of normal control flow, and use
-`unsafeOf(...)` when invalid input should fail fast.
+## Kotlin Support
 
-Collection refined types are direct-compatible immutable JDK collections.
-`NonEmptyList<T>` can be passed anywhere a `List<T>` is expected, and
-`NonEmptyMap<K, V>` can be passed anywhere a `Map<K, V>` is expected, without
-calling an extra unwrap method.
-
-More refined wrappers, including `NaturalInt` and `Ipv6String`:
-
-```java
-import io.github.junggikim.refined.refined.numeric.NaturalInt;
-import io.github.junggikim.refined.refined.string.Ipv6String;
-
-Validation<Violation, NaturalInt> retries = NaturalInt.of(3);
-Validation<Violation, Ipv6String> address = Ipv6String.of("2001:db8::1");
-
-String status = address.fold(
-    v -> "invalid ip: " + v.message(),
-    ok -> "ip ok: " + ok.value()
-);
-```
-
-## Kotlin/JVM Usage
-
-`java-refined-kotlin` is an optional Kotlin/JVM support module. It is not
-required for Java-only usage.
-
-It is a thin Kotlin-first layer on top of the core Java API.
-It keeps the same validation semantics while adding:
-
-- nullable receiver extensions such as `toNonBlankString()` and `toPositiveInt()`
-- `Validation` convenience helpers such as `getOrNull()`, `errorOrNull()`, and `getOrThrow()`
-- read-only Kotlin adapters for refined non-empty collections
-- `Sequence`-based factory extensions for collection refinement
+Optional module with Kotlin-idiomatic extensions:
 
 ```kotlin
-import io.github.junggikim.refined.kotlin.errorOrNull
-import io.github.junggikim.refined.kotlin.getOrThrow
-import io.github.junggikim.refined.kotlin.toNonBlankString
-import io.github.junggikim.refined.kotlin.toNonBlankStringOrThrow
-import io.github.junggikim.refined.kotlin.toNonEmptyListOrThrow
+import io.github.junggikim.refined.kotlin.*
 
 val name = "Ada".toNonBlankStringOrThrow()
-val nullableName = (null as String?).toNonBlankString()
-
-val message = nullableName.errorOrNull()!!.message
-val value: String = name.value
-
-val tags: List<String> = listOf("java", "fp").toNonEmptyListOrThrow()
-val upper = tags.map(String::uppercase)
-val refinedUpper = upper.toNonEmptyListOrThrow()
+val tags = listOf("java", "fp").toNonEmptyListOrThrow()
 ```
-
-Kotlin collection adapters are read-only views over the Java refined collections.
-They keep the same validation rules and immutable snapshot semantics, but mutator
-methods such as `add`, `put`, `offer`, or `addFirst` are not available from Kotlin.
-
-This means Kotlin code can stay concise and idiomatic while Java code keeps using
-the same core refined wrappers and validation model.
 
 ## Error Handling
 
-`Validation` is fail-fast (stops at the first error), while `Validated` accumulates multiple errors.
+`Validation<E, A>` is fail-fast — stops at the first error. Use it for single-field validation.
+`Validated<E, A>` accumulates all errors into a list. Use it when you need every failure at once.
 
 ```java
-import io.github.junggikim.refined.refined.string.NonBlankString;
-import io.github.junggikim.refined.validation.Validated;
-import io.github.junggikim.refined.validation.Validation;
-import io.github.junggikim.refined.violation.Violation;
-import java.util.Arrays;
-import java.util.List;
-
+// fail-fast
 Validation<Violation, NonBlankString> bad = NonBlankString.of("   ");
 String message = bad.fold(
     v -> "invalid: " + v.code() + " - " + v.message(),
     ok -> "ok: " + ok.value()
 );
 
+// error-accumulating
 Validated<String, Integer> left = Validated.invalid(Arrays.asList("age"));
 Validated<String, Integer> right = Validated.invalid(Arrays.asList("name"));
 List<String> errors = left.zip(right, Integer::sum).getErrors();
+// errors = ["age", "name"]
 ```
 
-## Core Concepts
+## API
 
-Refined wrappers expose two factory methods:
+All refined wrappers follow the same pattern:
 
-- `of(value)` returns `Validation<Violation, T>` and never throws.
-- `unsafeOf(value)` throws `RefinementException` on invalid input.
+- `of(value)` — returns `Validation<Violation, T>`, never throws
+- `unsafeOf(value)` — throws `RefinementException` on invalid input
+- `ofStream(stream)` — collection wrappers only
 
-Refined wrappers do not expose public constructors, so creation always goes through `of(...)` or `unsafeOf(...)`.
-Use `unsafeOf(...)` only at trusted boundaries after validation has already happened.
+Collection refined types implement JDK interfaces directly — `NonEmptyList<T>` is a `List<T>`, `NonEmptyMap<K,V>` is a `Map<K,V>`. No unwrapping needed.
 
-`Validation` is fail-fast and stops at the first error. `Validated` accumulates multiple errors into a non-empty list.
-
-For scalar wrappers such as `PositiveInt` or `NonBlankString`, the refined object
-stores the validated runtime value and exposes it through `value()`.
-
-For collection wrappers such as `NonEmptyList` or `NonEmptyMap`, the refined object
-is itself the collection interface. It preserves the non-empty invariant and immutable
-snapshot semantics while remaining directly usable as a JDK collection.
-Mutator methods such as `add`, `remove`, `put`, `offer`, or `poll` are not supported and throw.
-
-## Core API
-
-- `of(value)`
-  - safe constructor
-  - returns `Validation<Violation, T>`
-- `unsafeOf(value)`
-  - validates first
-  - throws `RefinementException` on failure
-  - use only at trusted boundaries after validation has already happened
-- collection wrappers additionally expose stream-based constructors
-  - `ofStream(stream)` for list/set/queue/deque/iterable/set-like wrappers
-  - `ofEntryStream(stream)` for map-like wrappers
-- `Violation`
-  - stable `code`, human-readable `message`, immutable `metadata`
-  - collection constructors distinguish `*-empty`, `*-null-element`, `*-null-key`, `*-null-value`, and sorted/navigable `*-invalid-*` failures
+`Violation` carries a stable `code`, human-readable `message`, and immutable `metadata` map.
 
 ## Supported Types
 
-The library ships with refined wrappers, control types, and predicate catalogs.
-Each table lists a type and the invariant it enforces.
-
-### Refined Wrappers — Numeric
-
-#### Int
-
-| Type | Description |
-| --- | --- |
-| `PositiveInt` | `int > 0` |
-| `NegativeInt` | `int < 0` |
-| `NonNegativeInt` | `int >= 0` |
-| `NonPositiveInt` | `int <= 0` |
-| `NonZeroInt` | `int != 0` |
-| `NaturalInt` | `int >= 0` |
-
-#### Long
-
-| Type | Description |
-| --- | --- |
-| `PositiveLong` | `long > 0` |
-| `NegativeLong` | `long < 0` |
-| `NonNegativeLong` | `long >= 0` |
-| `NonPositiveLong` | `long <= 0` |
-| `NonZeroLong` | `long != 0` |
-| `NaturalLong` | `long >= 0` |
-
-#### Byte
-
-| Type | Description |
-| --- | --- |
-| `PositiveByte` | `byte > 0` |
-| `NegativeByte` | `byte < 0` |
-| `NonNegativeByte` | `byte >= 0` |
-| `NonPositiveByte` | `byte <= 0` |
-| `NonZeroByte` | `byte != 0` |
-| `NaturalByte` | `byte >= 0` |
-
-#### Short
-
-| Type | Description |
-| --- | --- |
-| `PositiveShort` | `short > 0` |
-| `NegativeShort` | `short < 0` |
-| `NonNegativeShort` | `short >= 0` |
-| `NonPositiveShort` | `short <= 0` |
-| `NonZeroShort` | `short != 0` |
-| `NaturalShort` | `short >= 0` |
-
-#### Float
-
-| Type | Description |
-| --- | --- |
-| `PositiveFloat` | finite float > 0 |
-| `NegativeFloat` | finite float < 0 |
-| `NonNegativeFloat` | finite float >= 0 |
-| `NonPositiveFloat` | finite float <= 0 |
-| `NonZeroFloat` | finite float != 0 |
-| `FiniteFloat` | finite float (not NaN/Infinity) |
-| `NonNaNFloat` | float is not NaN (Infinity allowed) |
-| `ZeroToOneFloat` | finite float in [0, 1] |
-
-#### Double
-
-| Type | Description |
-| --- | --- |
-| `PositiveDouble` | finite double > 0 |
-| `NegativeDouble` | finite double < 0 |
-| `NonNegativeDouble` | finite double >= 0 |
-| `NonPositiveDouble` | finite double <= 0 |
-| `NonZeroDouble` | finite double != 0 |
-| `FiniteDouble` | finite double (not NaN/Infinity) |
-| `NonNaNDouble` | double is not NaN (Infinity allowed) |
-| `ZeroToOneDouble` | finite double in [0, 1] |
-
-#### BigInteger
-
-| Type | Description |
-| --- | --- |
-| `PositiveBigInteger` | `BigInteger > 0` |
-| `NegativeBigInteger` | `BigInteger < 0` |
-| `NonNegativeBigInteger` | `BigInteger >= 0` |
-| `NonPositiveBigInteger` | `BigInteger <= 0` |
-| `NonZeroBigInteger` | `BigInteger != 0` |
-| `NaturalBigInteger` | `BigInteger >= 0` |
-
-#### BigDecimal
-
-| Type | Description |
-| --- | --- |
-| `PositiveBigDecimal` | `BigDecimal > 0` |
-| `NegativeBigDecimal` | `BigDecimal < 0` |
-| `NonNegativeBigDecimal` | `BigDecimal >= 0` |
-| `NonPositiveBigDecimal` | `BigDecimal <= 0` |
-| `NonZeroBigDecimal` | `BigDecimal != 0` |
-
-### Refined Wrappers — Character
-
-| Type | Description |
-| --- | --- |
-| `DigitChar` | Unicode digit (`Character.isDigit`) |
-| `LetterChar` | Unicode letter (`Character.isLetter`) |
-| `LetterOrDigitChar` | Unicode letter or digit (`Character.isLetterOrDigit`) |
-| `LowerCaseChar` | Unicode lower-case (`Character.isLowerCase`) |
-| `UpperCaseChar` | Unicode upper-case (`Character.isUpperCase`) |
-| `WhitespaceChar` | Unicode whitespace (`Character.isWhitespace`) |
-| `SpecialChar` | not letter, digit, whitespace, or space |
-
-### Refined Wrappers — String
-
-#### Whitespace and Case
-
-| Type | Description |
-| --- | --- |
-| `NonEmptyString` | not empty |
-| `NonBlankString` | not blank (Unicode whitespace) |
-| `TrimmedString` | no leading or trailing Unicode whitespace |
-| `LowerCaseString` | equals `toLowerCase(Locale.ROOT)` |
-| `UpperCaseString` | equals `toUpperCase(Locale.ROOT)` |
-
-#### Character Sets and Slugs
-
-| Type | Description |
-| --- | --- |
-| `AsciiString` | ASCII only (U+0000..U+007F) |
-| `AlphabeticString` | non-empty; letters only |
-| `NumericString` | non-empty; digits only |
-| `AlphanumericString` | non-empty; letters or digits only |
-| `SlugString` | lower-case slug `a-z0-9` with hyphens |
-
-#### Identifiers and Tokens
-
-| Type | Description |
-| --- | --- |
-| `UuidString` | valid UUID |
-| `UlidString` | valid ULID (Crockford Base32, 26 chars) |
-| `JwtString` | three Base64URL parts separated by dots |
-| `SemVerString` | Semantic Versioning 2.0.0 pattern |
-| `CreditCardString` | Luhn-valid 13-19 digits (spaces/hyphens allowed) |
-| `IsbnString` | valid ISBN-10 or ISBN-13 (spaces/hyphens allowed) |
-
-#### URIs and URLs
-
-| Type | Description |
-| --- | --- |
-| `UriString` | parseable by `java.net.URI` |
-| `UrlString` | parseable by `java.net.URL` |
-
-#### Network
-
-| Type | Description |
-| --- | --- |
-| `Ipv4String` | IPv4 dotted-quad |
-| `Ipv6String` | IPv6 address |
-| `CidrV4String` | IPv4 CIDR with prefix `/0-32` |
-| `CidrV6String` | IPv6 CIDR with prefix `/0-128` |
-| `MacAddressString` | MAC address with `:`/`-`/`.` separators |
-| `HostnameString` | hostname labels (1-63 chars, letters/digits/hyphen), total length <= 253 |
-
-#### Encodings and Structured Formats
-
-| Type | Description |
-| --- | --- |
-| `EmailString` | well-formed email shape (basic local@domain rules) |
-| `RegexString` | valid regular expression |
-| `HexString` | non-empty hex string |
-| `HexColorString` | `#RGB`, `#RRGGBB`, or `#RRGGBBAA` |
-| `Base64String` | valid Base64 (JDK decoder) |
-| `Base64UrlString` | valid Base64 URL-safe (JDK decoder) |
-| `JsonString` | valid JSON |
-| `XmlString` | well-formed XML |
-| `XPathString` | valid XPath expression |
-
-#### Date and Time
-
-| Type | Description |
-| --- | --- |
-| `Iso8601DateString` | ISO-8601 date (`LocalDate.parse`) |
-| `Iso8601TimeString` | ISO-8601 time (`LocalTime.parse`) |
-| `Iso8601DateTimeString` | ISO-8601 date-time (`ISO_DATE_TIME`) |
-| `Iso8601DurationString` | ISO-8601 duration (`Duration.parse`) |
-| `Iso8601PeriodString` | ISO-8601 period (`Period.parse`) |
-| `TimeZoneIdString` | valid `ZoneId` |
-
-#### Numeric Parsing
-
-| Type | Description |
-| --- | --- |
-| `ValidByteString` | parseable by `Byte.parseByte` |
-| `ValidShortString` | parseable by `Short.parseShort` |
-| `ValidIntString` | parseable by `Integer.parseInt` |
-| `ValidLongString` | parseable by `Long.parseLong` |
-| `ValidFloatString` | parseable by `Float.parseFloat` (NaN/Infinity allowed) |
-| `ValidDoubleString` | parseable by `Double.parseDouble` (NaN/Infinity allowed) |
-| `ValidBigIntegerString` | parseable by `new BigInteger(...)` |
-| `ValidBigDecimalString` | parseable by `new BigDecimal(...)` |
-
-### Refined Wrappers — Collection
-
-| Type | Description |
-| --- | --- |
-| `NonEmptyList` | non-empty immutable `List` with no null elements |
-| `NonEmptySet` | non-empty immutable `Set` with no null elements |
-| `NonEmptyMap` | non-empty immutable `Map` with no null keys/values |
-| `NonEmptyDeque` | non-empty immutable `Deque` snapshot with no null elements |
-| `NonEmptyQueue` | non-empty immutable `Queue` snapshot with no null elements |
-| `NonEmptyIterable` | non-empty immutable sequence snapshot with no null elements |
-| `NonEmptySortedSet` | non-empty immutable `SortedSet` with no null elements |
-| `NonEmptySortedMap` | non-empty immutable `SortedMap` with no null keys/values |
-| `NonEmptyNavigableSet` | non-empty immutable `NavigableSet` with no null elements |
-| `NonEmptyNavigableMap` | non-empty immutable `NavigableMap` with no null keys/values |
-
-### Control Types
-
-| Type | Description |
-| --- | --- |
-| `Option` | optional value (`Some` or `None`) |
-| `Either` | left or right branch |
-| `Try` | success or captured exception |
-| `Ior` | inclusive-or: left, right, or both |
-| `Validated` | error-accumulating validation result |
-
-### Predicates — Numeric (Comparison)
-
-| Predicate | Description |
-| --- | --- |
-| `GreaterThan` | value > bound |
-| `GreaterOrEqual` | value >= bound |
-| `LessThan` | value < bound |
-| `LessOrEqual` | value <= bound |
-| `EqualTo` | value == bound |
-| `NotEqualTo` | value != bound |
-
-### Predicates — Numeric (Intervals)
-
-| Predicate | Description |
-| --- | --- |
-| `OpenInterval` | min < value < max |
-| `ClosedInterval` | min <= value <= max |
-| `OpenClosedInterval` | min < value <= max |
-| `ClosedOpenInterval` | min <= value < max |
-
-### Predicates — Numeric (Parity)
-
-| Predicate | Description |
-| --- | --- |
-| `EvenInt` | int is even |
-| `OddInt` | int is odd |
-| `EvenLong` | long is even |
-| `OddLong` | long is odd |
-| `EvenBigInteger` | BigInteger is even |
-| `OddBigInteger` | BigInteger is odd |
-
-### Predicates — Numeric (Divisibility)
-
-| Predicate | Description |
-| --- | --- |
-| `DivisibleByInt` | value % divisor == 0 |
-| `DivisibleByLong` | value % divisor == 0 |
-| `DivisibleByBigInteger` | value mod divisor == 0 |
-| `NonDivisibleByInt` | value % divisor != 0 |
-| `NonDivisibleByLong` | value % divisor != 0 |
-| `NonDivisibleByBigInteger` | value mod divisor != 0 |
-| `ModuloInt` | value % divisor == remainder |
-| `ModuloLong` | value % divisor == remainder |
-
-### Predicates — Numeric (Float/Double)
-
-| Predicate | Description |
-| --- | --- |
-| `FiniteFloatPredicate` | float is finite |
-| `FiniteDoublePredicate` | double is finite |
-| `NonNaNFloatPredicate` | float is not NaN (Infinity allowed) |
-| `NonNaNDoublePredicate` | double is not NaN (Infinity allowed) |
-
-### Predicates — String
-
-| Predicate | Description |
-| --- | --- |
-| `NotEmpty` | string not empty |
-| `NotBlank` | string not blank (Unicode whitespace) |
-| `LengthAtLeast` | length >= minimum |
-| `LengthAtMost` | length <= maximum |
-| `LengthBetween` | minimum <= length <= maximum |
-| `MatchesRegex` | matches the regex pattern |
-| `StartsWith` | starts with prefix |
-| `EndsWith` | ends with suffix |
-| `Contains` | contains infix |
-
-### Predicates — Boolean
-
-| Predicate | Description |
-| --- | --- |
-| `TrueValue` | value is true |
-| `FalseValue` | value is false |
-| `And` | all values in a list are true |
-| `Or` | at least one value in a list is true |
-| `Xor` | odd number of values in a list are true |
-| `Nand` | not all values in a list are true |
-| `Nor` | no values in a list are true |
-| `OneOf` | exactly one value in a list is true |
-
-### Predicates — Character
-
-| Predicate | Description |
-| --- | --- |
-| `IsDigitChar` | Unicode digit (`Character.isDigit`) |
-| `IsLetterChar` | Unicode letter (`Character.isLetter`) |
-| `IsLetterOrDigitChar` | Unicode letter or digit (`Character.isLetterOrDigit`) |
-| `IsLowerCaseChar` | Unicode lower-case (`Character.isLowerCase`) |
-| `IsUpperCaseChar` | Unicode upper-case (`Character.isUpperCase`) |
-| `IsWhitespaceChar` | Unicode whitespace (`Character.isWhitespace`) |
-| `IsSpecialChar` | not letter, digit, whitespace, or space |
-
-### Predicates — Collection
-
-| Predicate | Description |
-| --- | --- |
-| `MinSize` | size >= minimum |
-| `MaxSize` | size <= maximum |
-| `SizeBetween` | minimum <= size <= maximum |
-| `SizeEqual` | size == expected |
-| `ContainsElement` | collection contains expected element |
-| `EmptyCollection` | collection is empty |
-| `ForAllElements` | all elements satisfy predicate |
-| `ExistsElement` | at least one element satisfies predicate |
-| `HeadSatisfies` | first element satisfies predicate (non-empty list) |
-| `LastSatisfies` | last element satisfies predicate (non-empty list) |
-| `IndexSatisfies` | element at index satisfies predicate |
-| `InitSatisfies` | init slice (all but last) satisfies predicate |
-| `TailSatisfies` | tail slice (all but first) satisfies predicate |
-| `CountMatches` | matching element count equals expected count |
-| `AscendingList` | list is non-decreasing |
-| `DescendingList` | list is non-increasing |
-
-### Predicates — Logical
-
-| Predicate | Description |
-| --- | --- |
-| `AllOf` | all delegated constraints must pass |
-| `AnyOf` | at least one delegated constraint must pass |
-| `Not` | delegated constraint must fail |
-
-The full matrix is kept in [docs/type-matrix.md](docs/type-matrix.md).
-
-## Compatibility
-
-- production baseline: Java 8
-- Java 8+ supported
-- verification:
-  - `./gradlew clean check`
-  - `./gradlew testJava8`
-  - `./gradlew javadoc`
-  - `./gradlew pitest`
-- Java 8 runtime compatibility is verified by the `testJava8` toolchain task
-- mutation testing is enforced with a 95% kill threshold via PITest
-- current build uses Java 8 source/target compatibility and Gradle `--release 8` when running on JDK 9+
-
-See [docs/compatibility.md](docs/compatibility.md) for Java version caveats.
-See [docs/kotlin-support-policy.md](docs/kotlin-support-policy.md) for Kotlin version support details.
-
-## Project Status
-
-- current version: `1.1.0`
-- distribution: Maven Central
-- release notes live in [CHANGELOG.md](CHANGELOG.md)
-
-## Contributing and Security
-
-- contribution guide: [CONTRIBUTING.md](CONTRIBUTING.md)
-- code of conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
-- security policy: [SECURITY.md](SECURITY.md)
+| Category | Examples | Count |
+| --- | --- | --- |
+| Numeric | `PositiveInt`, `NegativeLong`, `NonZeroDouble`, `ZeroToOneFloat` | 46 |
+| Character | `DigitChar`, `LetterChar`, `UpperCaseChar` | 7 |
+| String | `NonBlankString`, `EmailString`, `UuidString`, `Ipv4String`, `JwtString` | 48 |
+| Collection | `NonEmptyList`, `NonEmptySet`, `NonEmptyMap`, `NonEmptyDeque`, `NonEmptyNavigableMap`, ... | 10 |
+| Control | `Option`, `Either`, `Try`, `Ior`, `Validated` | 5 |
+| Predicates | `GreaterThan`, `LengthBetween`, `MatchesRegex`, `AllOf`, `ForAllElements` | 55+ |
+
+Full list: [docs/type-matrix.md](docs/type-matrix.md)
+
+## Contributing
+
+[CONTRIBUTING.md](CONTRIBUTING.md) · [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) · [SECURITY.md](SECURITY.md) · [docs/compatibility.md](docs/compatibility.md) · [docs/kotlin-support-policy.md](docs/kotlin-support-policy.md)
 
 ## License
 
