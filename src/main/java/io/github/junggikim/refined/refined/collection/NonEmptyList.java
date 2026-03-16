@@ -8,6 +8,7 @@ import io.github.junggikim.refined.internal.RefinedSupport;
 import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 
+/** A non-empty immutable {@code List} snapshot with no null elements. */
 public final class NonEmptyList<T> extends AbstractList<T> {
 
     private final List<T> elements;

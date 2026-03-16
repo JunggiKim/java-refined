@@ -7,6 +7,7 @@ import io.github.junggikim.refined.newtype.Newtype;
 import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 
+/** Wraps a {@code long} value that is non-positive ({@code <= 0}). */
 public final class NonPositiveLong extends AbstractRefined<Long> implements Newtype<Long> {
 
     private static final Constraint<Long> CONSTRAINT = RefinedSupport.nonPositiveLong();

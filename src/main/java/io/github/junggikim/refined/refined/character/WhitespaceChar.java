@@ -7,6 +7,7 @@ import io.github.junggikim.refined.newtype.Newtype;
 import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 
+/** Wraps a {@code char} that is whitespace ({@code Character.isWhitespace}). */
 public final class WhitespaceChar extends AbstractRefined<Character> implements Newtype<Character> {
 
     private static final Constraint<Character> CONSTRAINT = RefinedSupport.whitespaceChar();

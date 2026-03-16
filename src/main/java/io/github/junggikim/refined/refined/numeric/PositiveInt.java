@@ -7,6 +7,7 @@ import io.github.junggikim.refined.newtype.Newtype;
 import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 
+/** Wraps an {@code int} value that is strictly positive ({@code > 0}). */
 public final class PositiveInt extends AbstractRefined<Integer> implements Newtype<Integer> {
 
     private static final Constraint<Integer> CONSTRAINT = RefinedSupport.positiveInt();

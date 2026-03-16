@@ -11,6 +11,7 @@ import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 import java.util.Deque;
 
+/** A non-empty immutable {@code Deque} snapshot with no null elements. */
 public final class NonEmptyDeque<T> extends AbstractList<T> implements Deque<T> {
 
     private final List<T> elements;

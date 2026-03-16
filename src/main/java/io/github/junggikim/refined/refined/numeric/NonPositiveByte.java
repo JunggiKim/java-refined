@@ -7,6 +7,7 @@ import io.github.junggikim.refined.newtype.Newtype;
 import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 
+/** Wraps a {@code byte} value that is non-positive ({@code <= 0}). */
 public final class NonPositiveByte extends AbstractRefined<Byte> implements Newtype<Byte> {
 
     private static final Constraint<Byte> CONSTRAINT = RefinedSupport.nonPositiveByte();

@@ -7,6 +7,7 @@ import io.github.junggikim.refined.newtype.Newtype;
 import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 
+/** Wraps a {@code char} that is a special character (not a letter, digit, or whitespace). */
 public final class SpecialChar extends AbstractRefined<Character> implements Newtype<Character> {
 
     private static final Constraint<Character> CONSTRAINT = RefinedSupport.specialChar();

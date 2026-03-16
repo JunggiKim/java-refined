@@ -7,6 +7,7 @@ import io.github.junggikim.refined.newtype.Newtype;
 import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 
+/** Wraps a {@code String} that is a valid ISO 8601 date-time. */
 public final class Iso8601DateTimeString extends AbstractRefined<String> implements Newtype<String> {
 
     private static final Constraint<String> CONSTRAINT = RefinedSupport.iso8601DateTimeString();

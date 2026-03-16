@@ -7,6 +7,7 @@ import io.github.junggikim.refined.newtype.Newtype;
 import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 
+/** Wraps a {@code double} value that is not NaN. */
 public final class NonNaNDouble extends AbstractRefined<Double> implements Newtype<Double> {
 
     private static final Constraint<Double> CONSTRAINT = RefinedSupport.nonNaNDouble();

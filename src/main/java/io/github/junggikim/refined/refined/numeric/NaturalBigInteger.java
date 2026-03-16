@@ -8,6 +8,7 @@ import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 import java.math.BigInteger;
 
+/** Wraps a {@code BigInteger} value that is a natural number ({@code >= 0}). */
 public final class NaturalBigInteger extends AbstractRefined<BigInteger> implements Newtype<BigInteger> {
 
     private static final Constraint<BigInteger> CONSTRAINT = RefinedSupport.naturalBigInteger();

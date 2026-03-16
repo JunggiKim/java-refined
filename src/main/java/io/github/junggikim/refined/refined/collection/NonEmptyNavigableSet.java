@@ -11,6 +11,7 @@ import io.github.junggikim.refined.internal.RefinedSupport;
 import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 
+/** A non-empty immutable {@code NavigableSet} snapshot with no null elements. */
 public final class NonEmptyNavigableSet<T> extends AbstractSet<T> implements NavigableSet<T> {
 
     private final NavigableSet<T> elements;

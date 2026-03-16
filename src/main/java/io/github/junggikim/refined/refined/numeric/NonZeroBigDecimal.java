@@ -8,6 +8,7 @@ import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 import java.math.BigDecimal;
 
+/** Wraps a {@code BigDecimal} value that is non-zero. */
 public final class NonZeroBigDecimal extends AbstractRefined<BigDecimal> implements Newtype<BigDecimal> {
 
     private static final Constraint<BigDecimal> CONSTRAINT = RefinedSupport.nonZeroBigDecimal();

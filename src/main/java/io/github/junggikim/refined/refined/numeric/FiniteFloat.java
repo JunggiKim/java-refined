@@ -7,6 +7,7 @@ import io.github.junggikim.refined.newtype.Newtype;
 import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 
+/** Wraps a {@code float} value that is finite (not infinity or NaN). */
 public final class FiniteFloat extends AbstractRefined<Float> implements Newtype<Float> {
 
     private static final Constraint<Float> CONSTRAINT = RefinedSupport.finiteFloat();

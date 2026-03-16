@@ -11,6 +11,7 @@ import io.github.junggikim.refined.internal.RefinedSupport;
 import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 
+/** A non-empty immutable {@code SortedMap} snapshot with no null keys or values. */
 public final class NonEmptySortedMap<K, V> extends AbstractMap<K, V> implements SortedMap<K, V> {
 
     private final SortedMap<K, V> entries;
