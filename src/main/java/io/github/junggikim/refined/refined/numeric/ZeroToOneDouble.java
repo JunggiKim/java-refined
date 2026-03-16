@@ -7,7 +7,7 @@ import io.github.junggikim.refined.newtype.Newtype;
 import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 
-/** Wraps a {@code double} value in the range {@code [0, 1]}. */
+/** Wraps a finite {@code double} value in the range {@code [0, 1]}. */
 public final class ZeroToOneDouble extends AbstractRefined<Double> implements Newtype<Double> {
 
     private static final Constraint<Double> CONSTRAINT = RefinedSupport.zeroToOneDouble();

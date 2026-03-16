@@ -7,7 +7,7 @@ import io.github.junggikim.refined.newtype.Newtype;
 import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 
-/** Wraps a {@code float} value in the range {@code [0, 1]}. */
+/** Wraps a finite {@code float} value in the range {@code [0, 1]}. */
 public final class ZeroToOneFloat extends AbstractRefined<Float> implements Newtype<Float> {
 
     private static final Constraint<Float> CONSTRAINT = RefinedSupport.zeroToOneFloat();

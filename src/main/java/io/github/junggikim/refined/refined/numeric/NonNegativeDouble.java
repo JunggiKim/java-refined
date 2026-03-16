@@ -7,7 +7,7 @@ import io.github.junggikim.refined.newtype.Newtype;
 import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 
-/** Wraps a {@code double} value that is non-negative ({@code >= 0}). */
+/** Wraps a finite {@code double} value that is non-negative ({@code >= 0}). */
 public final class NonNegativeDouble extends AbstractRefined<Double> implements Newtype<Double> {
 
     private static final Constraint<Double> CONSTRAINT = RefinedSupport.nonNegativeDouble();
