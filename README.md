@@ -65,6 +65,33 @@ Java applications often validate the same invariants repeatedly:
 Java Refined packages those invariants into reusable types and predicates so
 that "already validated" becomes part of the type system at the library level.
 
+### Before
+
+```java
+public void createUser(String name, int age, List<String> roles) {
+    if (name == null || name.trim().isEmpty()) {
+        throw new IllegalArgumentException("name must not be blank");
+    }
+    if (age <= 0) {
+        throw new IllegalArgumentException("age must be positive");
+    }
+    if (roles == null || roles.isEmpty()) {
+        throw new IllegalArgumentException("roles must not be empty");
+    }
+    // business logic ...
+}
+```
+
+### After
+
+```java
+public void createUser(NonBlankString name, PositiveInt age, NonEmptyList<String> roles) {
+    // no validation needed — the types guarantee it
+}
+```
+
+Types replace scattered `if`-checks. Invalid data cannot even reach your method.
+
 ## Terminology
 
 Validation means "a validation result". It contains either a valid value or an error.
