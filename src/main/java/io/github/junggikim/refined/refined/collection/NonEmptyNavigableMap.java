@@ -13,6 +13,7 @@ import io.github.junggikim.refined.internal.RefinedSupport;
 import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 
+/** A non-empty immutable {@code NavigableMap} snapshot with no null keys or values. */
 public final class NonEmptyNavigableMap<K, V> extends AbstractMap<K, V> implements NavigableMap<K, V> {
 
     private final NavigableMap<K, V> entries;

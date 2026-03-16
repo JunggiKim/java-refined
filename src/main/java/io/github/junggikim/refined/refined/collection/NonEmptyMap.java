@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+/** A non-empty immutable {@code Map} snapshot with no null keys or values. */
 public final class NonEmptyMap<K, V> extends AbstractMap<K, V> {
 
     private final Map<K, V> entries;

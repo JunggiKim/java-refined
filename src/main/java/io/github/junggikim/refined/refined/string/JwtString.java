@@ -7,6 +7,7 @@ import io.github.junggikim.refined.newtype.Newtype;
 import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 
+/** Wraps a {@code String} that has a valid JWT structure (three Base64url-encoded parts). */
 public final class JwtString extends AbstractRefined<String> implements Newtype<String> {
 
     private static final Constraint<String> CONSTRAINT = RefinedSupport.jwtString();

@@ -9,6 +9,7 @@ import io.github.junggikim.refined.internal.RefinedSupport;
 import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 
+/** A non-empty immutable {@code Set} snapshot with no null elements. */
 public final class NonEmptySet<T> extends AbstractSet<T> {
 
     private final Set<T> elements;

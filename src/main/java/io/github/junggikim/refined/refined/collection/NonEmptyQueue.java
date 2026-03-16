@@ -9,6 +9,7 @@ import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 import java.util.Queue;
 
+/** A non-empty immutable {@code Queue} snapshot with no null elements. */
 public final class NonEmptyQueue<T> extends AbstractList<T> implements Queue<T> {
 
     private final List<T> elements;
