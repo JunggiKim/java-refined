@@ -7,7 +7,7 @@ import io.github.junggikim.refined.newtype.Newtype;
 import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 
-/** Wraps a {@code float} value that is strictly negative ({@code < 0}). */
+/** Wraps a finite {@code float} value that is strictly negative ({@code < 0}). */
 public final class NegativeFloat extends AbstractRefined<Float> implements Newtype<Float> {
 
     private static final Constraint<Float> CONSTRAINT = RefinedSupport.negativeFloat();

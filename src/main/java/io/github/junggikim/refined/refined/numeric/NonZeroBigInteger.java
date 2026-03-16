@@ -8,7 +8,7 @@ import io.github.junggikim.refined.validation.Validation;
 import io.github.junggikim.refined.violation.Violation;
 import java.math.BigInteger;
 
-/** Wraps a {@code BigInteger} value that is non-zero. */
+/** Wraps a {@code BigInteger} value that is non-zero ({@code != 0}). */
 public final class NonZeroBigInteger extends AbstractRefined<BigInteger> implements Newtype<BigInteger> {
 
     private static final Constraint<BigInteger> CONSTRAINT = RefinedSupport.nonZeroBigInteger();
