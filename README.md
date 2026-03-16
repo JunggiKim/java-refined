@@ -687,6 +687,7 @@ The full matrix is kept in [docs/type-matrix.md](docs/type-matrix.md).
 - current build uses Java 8 source/target compatibility and Gradle `--release 8` when running on JDK 9+
 
 See [docs/compatibility.md](docs/compatibility.md) for Java version caveats.
+See [docs/kotlin-support-policy.md](docs/kotlin-support-policy.md) for Kotlin version support details.
 
 ## Project Status
 
