@@ -35,31 +35,6 @@ public void createUser(NonBlankString name, PositiveInt age, NonEmptyList<String
 
 Types replace scattered `if`-checks. Invalid data cannot even reach your method.
 
-## Installation
-
-Published to [Maven Central](https://central.sonatype.com/artifact/io.github.junggikim/java-refined). Kotlin/JVM users can optionally add `java-refined-kotlin` for extension functions (adds `kotlin-stdlib` dependency).
-
-### Gradle Kotlin DSL
-
-```kotlin
-dependencies {
-    implementation("io.github.junggikim:java-refined:1.1.0")
-
-    // optional: Kotlin extensions
-    // implementation("io.github.junggikim:java-refined-kotlin:1.1.0")
-}
-```
-
-### Maven
-
-```xml
-<dependency>
-  <groupId>io.github.junggikim</groupId>
-  <artifactId>java-refined</artifactId>
-  <version>1.1.0</version>
-</dependency>
-```
-
 ## Quick Start
 
 ```java
@@ -82,6 +57,36 @@ Validation<Violation, String> summary =
 
 // unsafeOf() throws on invalid input — use at trusted boundaries
 PositiveInt confirmedAge = PositiveInt.unsafeOf(18);
+```
+
+## Installation
+
+> *"I can just implement this myself. Why add a dependency?"*
+>
+> Totally fair! Copy the source into your project — it's MIT licensed.
+> But if it saved you some time... give me a ⭐ 🥺
+
+Published to [Maven Central](https://central.sonatype.com/artifact/io.github.junggikim/java-refined). Kotlin/JVM users can optionally add `java-refined-kotlin` for extension functions (adds `kotlin-stdlib` dependency).
+
+### Gradle Kotlin DSL
+
+```kotlin
+dependencies {
+    implementation("io.github.junggikim:java-refined:1.1.0")
+
+    // optional: Kotlin extensions
+    // implementation("io.github.junggikim:java-refined-kotlin:1.1.0")
+}
+```
+
+### Maven
+
+```xml
+<dependency>
+  <groupId>io.github.junggikim</groupId>
+  <artifactId>java-refined</artifactId>
+  <version>1.1.0</version>
+</dependency>
 ```
 
 ## Kotlin Support
