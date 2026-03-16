@@ -6,6 +6,7 @@ coverage/
 .idea/
 *.iml
 .vscode/
+.openchrome/
 
 .DS_Store
 Thumbs.db
