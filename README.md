@@ -35,24 +35,6 @@ public void createUser(NonBlankString name, PositiveInt age, NonEmptyList<String
 
 Types replace scattered `if`-checks. Invalid data cannot even reach your method.
 
-## Quick Start
-
-```java
-// Trusted data — just unwrap
-PositiveInt confirmedAge = PositiveInt.unsafeOf(18);
-
-// Untrusted input — safe fallback
-PositiveInt safeAge = PositiveInt.ofOrElse(userInput, 1);
-```
-
-```java
-// Branch on success/failure
-EmailString.of(email).fold(
-    error -> badRequest(error.message()),
-    valid -> ok(register(valid))
-);
-```
-
 ## Installation
 
 > *"I can just implement this myself. Why add a dependency?"*
@@ -83,6 +65,24 @@ dependencies {
 </dependency>
 ```
 
+## Quick Start
+
+```java
+// Trusted data — just unwrap
+PositiveInt confirmedAge = PositiveInt.unsafeOf(18);
+
+// Untrusted input — safe fallback
+PositiveInt safeAge = PositiveInt.ofOrElse(userInput, 1);
+```
+
+```java
+// Branch on success/failure
+EmailString.of(email).fold(
+    error -> badRequest(error.message()),
+    valid -> ok(register(valid))
+);
+```
+
 ## Kotlin Support
 
 Optional module with Kotlin-idiomatic extensions:
@@ -90,46 +90,23 @@ Optional module with Kotlin-idiomatic extensions:
 ```kotlin
 import io.github.junggikim.refined.kotlin.*
 
-// Scalar extensions
 val name = "Ada".toNonBlankStringOrThrow()
 val tags = listOf("java", "fp").toNonEmptyListOrThrow()
+```
 
-// Validation extensions
-val age = PositiveInt.ofOrElse(input, 1)
+```kotlin
+// Safe fallback
+val safeAge = PositiveInt.ofOrElse(input, 1)
+```
+
+```kotlin
+// Kotlin-idiomatic nullable
 val age = PositiveInt.of(input).getOrNull() ?: PositiveInt.unsafeOf(1)
+```
+
+```kotlin
+// Convert to kotlin.Result
 val result: Result<PositiveInt> = PositiveInt.of(input).toResult()
-```
-
-## Usage Patterns
-
-```java
-// validate and get — most common
-PositiveInt age = PositiveInt.ofOrElse(input, 1);
-```
-
-```java
-// to Optional
-Optional<PositiveInt> maybeAge = PositiveInt.of(input).toOptional();
-```
-
-```java
-// transform error type
-Validation<String, PositiveInt> mapped = PositiveInt.of(input)
-    .mapError(Violation::message);
-```
-
-```java
-// recover from error
-Validation<Violation, PositiveInt> recovered = PositiveInt.of(input)
-    .recover(err -> PositiveInt.unsafeOf(1));
-```
-
-```java
-// error-accumulating (multiple fields at once)
-Validated<String, Integer> left = Validated.invalid(Arrays.asList("age"));
-Validated<String, Integer> right = Validated.invalid(Arrays.asList("name"));
-List<String> errors = left.zip(right, Integer::sum).getErrors();
-// errors = ["age", "name"]
 ```
 
 ## API
@@ -142,8 +119,6 @@ All refined wrappers follow the same pattern:
 - `ofStream(stream)` — collection wrappers only
 
 Collection refined types implement JDK interfaces directly — `NonEmptyList<T>` is a `List<T>`, `NonEmptyMap<K,V>` is a `Map<K,V>`. No unwrapping needed.
-
-`Violation` carries a stable `code`, human-readable `message`, and immutable `metadata` map.
 
 ## Supported Types
 
@@ -158,9 +133,15 @@ Collection refined types implement JDK interfaces directly — `NonEmptyList<T>`
 
 Full list: [docs/type-matrix.md](docs/type-matrix.md)
 
+## Docs
+
+- [Type Matrix](docs/type-matrix.md)
+- [Compatibility](docs/compatibility.md)
+- [Kotlin Support Policy](docs/kotlin-support-policy.md)
+
 ## Contributing
 
-[CONTRIBUTING.md](CONTRIBUTING.md) · [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) · [SECURITY.md](SECURITY.md) · [docs/compatibility.md](docs/compatibility.md) · [docs/kotlin-support-policy.md](docs/kotlin-support-policy.md)
+[CONTRIBUTING.md](CONTRIBUTING.md) · [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) · [SECURITY.md](SECURITY.md)
 
 ## License
 
