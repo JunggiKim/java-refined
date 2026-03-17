@@ -78,4 +78,23 @@ public final class NonEmptyMap<K, V> extends AbstractMap<K, V> {
     public int size() {
         return entries.size();
     }
+
+    /**
+     * Returns a validated instance, or falls back to {@code defaultValue} if invalid.
+     *
+     * @param value input to validate
+     * @param defaultValue fallback (must itself be valid)
+     * @param <K> key type
+     * @param <V> value type
+     * @return refined instance
+     * @throws RefinementException if defaultValue is also invalid
+     */
+    @org.jetbrains.annotations.NotNull
+    public static <K, V> NonEmptyMap<K, V> ofOrElse(
+        @org.jetbrains.annotations.Nullable Map<K, V> value,
+        @org.jetbrains.annotations.NotNull Map<K, V> defaultValue
+    ) {
+        Validation<Violation, NonEmptyMap<K, V>> result = of(value);
+        return result.isValid() ? result.get() : unsafeOf(defaultValue);
+    }
 }

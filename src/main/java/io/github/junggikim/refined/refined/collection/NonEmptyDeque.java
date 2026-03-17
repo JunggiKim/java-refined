@@ -175,6 +175,24 @@ public final class NonEmptyDeque<T> extends AbstractList<T> implements Deque<T> 
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Returns a validated instance, or falls back to {@code defaultValue} if invalid.
+     *
+     * @param value input to validate
+     * @param defaultValue fallback (must itself be valid)
+     * @param <T> element type
+     * @return refined instance
+     * @throws RefinementException if defaultValue is also invalid
+     */
+    @org.jetbrains.annotations.NotNull
+    public static <T> NonEmptyDeque<T> ofOrElse(
+        @org.jetbrains.annotations.Nullable Deque<T> value,
+        @org.jetbrains.annotations.NotNull Deque<T> defaultValue
+    ) {
+        Validation<Violation, NonEmptyDeque<T>> result = of(value);
+        return result.isValid() ? result.get() : unsafeOf(defaultValue);
+    }
+
     @Override
     public Iterator<T> descendingIterator() {
         final ListIterator<T> iterator = elements.listIterator(elements.size());

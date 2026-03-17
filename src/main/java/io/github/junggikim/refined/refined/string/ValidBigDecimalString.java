@@ -23,4 +23,18 @@ public final class ValidBigDecimalString extends AbstractRefined<String> impleme
     public static ValidBigDecimalString unsafeOf(String value) {
         return RefinedSupport.unsafeRefine(value, CONSTRAINT, ValidBigDecimalString::new);
     }
+
+    /**
+     * Returns a validated instance, or falls back to {@code defaultValue} if invalid.
+     *
+     * @param value input to validate
+     * @param defaultValue fallback (must itself be valid)
+     * @return refined instance
+     * @throws io.github.junggikim.refined.core.RefinementException if defaultValue is also invalid
+     */
+    @org.jetbrains.annotations.NotNull
+    public static ValidBigDecimalString ofOrElse(@org.jetbrains.annotations.Nullable String value, @org.jetbrains.annotations.NotNull String defaultValue) {
+        Validation<Violation, ValidBigDecimalString> result = of(value);
+        return result.isValid() ? result.get() : unsafeOf(defaultValue);
+    }
 }

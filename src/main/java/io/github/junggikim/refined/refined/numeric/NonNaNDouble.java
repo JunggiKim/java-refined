@@ -23,4 +23,18 @@ public final class NonNaNDouble extends AbstractRefined<Double> implements Newty
     public static NonNaNDouble unsafeOf(Double value) {
         return RefinedSupport.unsafeRefine(value, CONSTRAINT, NonNaNDouble::new);
     }
+
+    /**
+     * Returns a validated instance, or falls back to {@code defaultValue} if invalid.
+     *
+     * @param value input to validate
+     * @param defaultValue fallback (must itself be valid)
+     * @return refined instance
+     * @throws io.github.junggikim.refined.core.RefinementException if defaultValue is also invalid
+     */
+    @org.jetbrains.annotations.NotNull
+    public static NonNaNDouble ofOrElse(@org.jetbrains.annotations.Nullable Double value, @org.jetbrains.annotations.NotNull Double defaultValue) {
+        Validation<Violation, NonNaNDouble> result = of(value);
+        return result.isValid() ? result.get() : unsafeOf(defaultValue);
+    }
 }

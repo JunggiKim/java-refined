@@ -23,4 +23,18 @@ public final class NegativeByte extends AbstractRefined<Byte> implements Newtype
     public static NegativeByte unsafeOf(Byte value) {
         return RefinedSupport.unsafeRefine(value, CONSTRAINT, NegativeByte::new);
     }
+
+    /**
+     * Returns a validated instance, or falls back to {@code defaultValue} if invalid.
+     *
+     * @param value input to validate
+     * @param defaultValue fallback (must itself be valid)
+     * @return refined instance
+     * @throws io.github.junggikim.refined.core.RefinementException if defaultValue is also invalid
+     */
+    @org.jetbrains.annotations.NotNull
+    public static NegativeByte ofOrElse(@org.jetbrains.annotations.Nullable Byte value, @org.jetbrains.annotations.NotNull Byte defaultValue) {
+        Validation<Violation, NegativeByte> result = of(value);
+        return result.isValid() ? result.get() : unsafeOf(defaultValue);
+    }
 }

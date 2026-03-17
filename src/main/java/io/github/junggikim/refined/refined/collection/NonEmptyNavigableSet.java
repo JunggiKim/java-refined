@@ -180,4 +180,22 @@ public final class NonEmptyNavigableSet<T> extends AbstractSet<T> implements Nav
     public T last() {
         return elements.last();
     }
+
+    /**
+     * Returns a validated instance, or falls back to {@code defaultValue} if invalid.
+     *
+     * @param value input to validate
+     * @param defaultValue fallback (must itself be valid)
+     * @param <T> element type
+     * @return refined instance
+     * @throws RefinementException if defaultValue is also invalid
+     */
+    @org.jetbrains.annotations.NotNull
+    public static <T> NonEmptyNavigableSet<T> ofOrElse(
+        @org.jetbrains.annotations.Nullable NavigableSet<T> value,
+        @org.jetbrains.annotations.NotNull NavigableSet<T> defaultValue
+    ) {
+        Validation<Violation, NonEmptyNavigableSet<T>> result = of(value);
+        return result.isValid() ? result.get() : unsafeOf(defaultValue);
+    }
 }

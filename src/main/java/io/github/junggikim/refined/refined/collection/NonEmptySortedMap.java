@@ -141,4 +141,23 @@ public final class NonEmptySortedMap<K, V> extends AbstractMap<K, V> implements 
     public int size() {
         return entries.size();
     }
+
+    /**
+     * Returns a validated instance, or falls back to {@code defaultValue} if invalid.
+     *
+     * @param value input to validate
+     * @param defaultValue fallback (must itself be valid)
+     * @param <K> key type
+     * @param <V> value type
+     * @return refined instance
+     * @throws RefinementException if defaultValue is also invalid
+     */
+    @org.jetbrains.annotations.NotNull
+    public static <K, V> NonEmptySortedMap<K, V> ofOrElse(
+        @org.jetbrains.annotations.Nullable SortedMap<K, V> value,
+        @org.jetbrains.annotations.NotNull SortedMap<K, V> defaultValue
+    ) {
+        Validation<Violation, NonEmptySortedMap<K, V>> result = of(value);
+        return result.isValid() ? result.get() : unsafeOf(defaultValue);
+    }
 }

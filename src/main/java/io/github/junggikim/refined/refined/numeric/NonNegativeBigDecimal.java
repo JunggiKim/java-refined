@@ -24,4 +24,18 @@ public final class NonNegativeBigDecimal extends AbstractRefined<BigDecimal> imp
     public static NonNegativeBigDecimal unsafeOf(BigDecimal value) {
         return RefinedSupport.unsafeRefine(value, CONSTRAINT, NonNegativeBigDecimal::new);
     }
+
+    /**
+     * Returns a validated instance, or falls back to {@code defaultValue} if invalid.
+     *
+     * @param value input to validate
+     * @param defaultValue fallback (must itself be valid)
+     * @return refined instance
+     * @throws io.github.junggikim.refined.core.RefinementException if defaultValue is also invalid
+     */
+    @org.jetbrains.annotations.NotNull
+    public static NonNegativeBigDecimal ofOrElse(@org.jetbrains.annotations.Nullable BigDecimal value, @org.jetbrains.annotations.NotNull BigDecimal defaultValue) {
+        Validation<Violation, NonNegativeBigDecimal> result = of(value);
+        return result.isValid() ? result.get() : unsafeOf(defaultValue);
+    }
 }

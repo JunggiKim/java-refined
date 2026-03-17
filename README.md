@@ -38,25 +38,19 @@ Types replace scattered `if`-checks. Invalid data cannot even reach your method.
 ## Quick Start
 
 ```java
-import io.github.junggikim.refined.refined.numeric.PositiveInt;
-import io.github.junggikim.refined.refined.string.NonBlankString;
-import io.github.junggikim.refined.refined.collection.NonEmptyList;
-import io.github.junggikim.refined.validation.Validation;
-import io.github.junggikim.refined.violation.Violation;
-import java.util.Arrays;
-
-// of() returns Validation — never throws
-Validation<Violation, PositiveInt> age = PositiveInt.of(18);
-Validation<Violation, NonBlankString> name = NonBlankString.of("Ada");
-Validation<Violation, NonEmptyList<String>> tags =
-    NonEmptyList.of(Arrays.asList("java", "fp"));  // or List.of() on Java 9+
-
-// combine results
-Validation<Violation, String> summary =
-    name.zip(age, (n, a) -> n.value() + " (" + a.value() + ")");
-
-// unsafeOf() throws on invalid input — use at trusted boundaries
+// Trusted data — just unwrap
 PositiveInt confirmedAge = PositiveInt.unsafeOf(18);
+
+// Untrusted input — safe fallback
+PositiveInt safeAge = PositiveInt.ofOrElse(userInput, 1);
+```
+
+```java
+// Branch on success/failure
+EmailString.of(email).fold(
+    error -> badRequest(error.message()),
+    valid -> ok(register(valid))
+);
 ```
 
 ## Installation
@@ -96,24 +90,42 @@ Optional module with Kotlin-idiomatic extensions:
 ```kotlin
 import io.github.junggikim.refined.kotlin.*
 
+// Scalar extensions
 val name = "Ada".toNonBlankStringOrThrow()
 val tags = listOf("java", "fp").toNonEmptyListOrThrow()
+
+// Validation extensions
+val age = PositiveInt.ofOrElse(input, 1)
+val age = PositiveInt.of(input).getOrNull() ?: PositiveInt.unsafeOf(1)
+val result: Result<PositiveInt> = PositiveInt.of(input).toResult()
 ```
 
-## Error Handling
-
-`Validation<E, A>` is fail-fast — stops at the first error. Use it for single-field validation.
-`Validated<E, A>` accumulates all errors into a list. Use it when you need every failure at once.
+## Usage Patterns
 
 ```java
-// fail-fast
-Validation<Violation, NonBlankString> bad = NonBlankString.of("   ");
-String message = bad.fold(
-    v -> "invalid: " + v.code() + " - " + v.message(),
-    ok -> "ok: " + ok.value()
-);
+// validate and get — most common
+PositiveInt age = PositiveInt.ofOrElse(input, 1);
+```
 
-// error-accumulating
+```java
+// to Optional
+Optional<PositiveInt> maybeAge = PositiveInt.of(input).toOptional();
+```
+
+```java
+// transform error type
+Validation<String, PositiveInt> mapped = PositiveInt.of(input)
+    .mapError(Violation::message);
+```
+
+```java
+// recover from error
+Validation<Violation, PositiveInt> recovered = PositiveInt.of(input)
+    .recover(err -> PositiveInt.unsafeOf(1));
+```
+
+```java
+// error-accumulating (multiple fields at once)
 Validated<String, Integer> left = Validated.invalid(Arrays.asList("age"));
 Validated<String, Integer> right = Validated.invalid(Arrays.asList("name"));
 List<String> errors = left.zip(right, Integer::sum).getErrors();
@@ -126,6 +138,7 @@ All refined wrappers follow the same pattern:
 
 - `of(value)` — returns `Validation<Violation, T>`, never throws
 - `unsafeOf(value)` — throws `RefinementException` on invalid input
+- `ofOrElse(value, default)` — returns validated instance or falls back to `default`
 - `ofStream(stream)` — collection wrappers only
 
 Collection refined types implement JDK interfaces directly — `NonEmptyList<T>` is a `List<T>`, `NonEmptyMap<K,V>` is a `Map<K,V>`. No unwrapping needed.

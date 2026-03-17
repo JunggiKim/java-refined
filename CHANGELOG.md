@@ -7,8 +7,13 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+### Added
+- `Validation` convenience default methods: `getOrElse`, `getOrNull`, `toOptional`, `onValid`, `onInvalid`, `mapError`, `recover`
+- `ofOrElse(value, defaultValue)` static factory on all refined types (numeric, character, string, collection) for safe fallback creation
+
 ### Changed
 - Downgraded `com.vanniktech.maven.publish` from 0.36.0 to 0.35.0 for Kotlin 1.9.x compatibility
+- Kotlin extensions `getOrNull()`, `onValid()`, `onInvalid()` on `Validation` removed in favor of Java default methods with the same signatures
 
 ## [1.1.0] - 2026-03-13
 

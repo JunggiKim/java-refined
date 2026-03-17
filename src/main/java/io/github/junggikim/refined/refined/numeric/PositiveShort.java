@@ -23,4 +23,18 @@ public final class PositiveShort extends AbstractRefined<Short> implements Newty
     public static PositiveShort unsafeOf(Short value) {
         return RefinedSupport.unsafeRefine(value, CONSTRAINT, PositiveShort::new);
     }
+
+    /**
+     * Returns a validated instance, or falls back to {@code defaultValue} if invalid.
+     *
+     * @param value input to validate
+     * @param defaultValue fallback (must itself be valid)
+     * @return refined instance
+     * @throws io.github.junggikim.refined.core.RefinementException if defaultValue is also invalid
+     */
+    @org.jetbrains.annotations.NotNull
+    public static PositiveShort ofOrElse(@org.jetbrains.annotations.Nullable Short value, @org.jetbrains.annotations.NotNull Short defaultValue) {
+        Validation<Violation, PositiveShort> result = of(value);
+        return result.isValid() ? result.get() : unsafeOf(defaultValue);
+    }
 }

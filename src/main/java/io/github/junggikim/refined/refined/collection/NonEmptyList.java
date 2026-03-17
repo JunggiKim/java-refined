@@ -66,4 +66,22 @@ public final class NonEmptyList<T> extends AbstractList<T> {
     public List<T> tail() {
         return elements.subList(1, elements.size());
     }
+
+    /**
+     * Returns a validated instance, or falls back to {@code defaultValue} if invalid.
+     *
+     * @param value input to validate
+     * @param defaultValue fallback (must itself be valid)
+     * @param <T> element type
+     * @return refined instance
+     * @throws RefinementException if defaultValue is also invalid
+     */
+    @org.jetbrains.annotations.NotNull
+    public static <T> NonEmptyList<T> ofOrElse(
+        @org.jetbrains.annotations.Nullable List<T> value,
+        @org.jetbrains.annotations.NotNull List<T> defaultValue
+    ) {
+        Validation<Violation, NonEmptyList<T>> result = of(value);
+        return result.isValid() ? result.get() : unsafeOf(defaultValue);
+    }
 }

@@ -235,4 +235,23 @@ public final class NonEmptyNavigableMap<K, V> extends AbstractMap<K, V> implemen
     public K lastKey() {
         return entries.lastKey();
     }
+
+    /**
+     * Returns a validated instance, or falls back to {@code defaultValue} if invalid.
+     *
+     * @param value input to validate
+     * @param defaultValue fallback (must itself be valid)
+     * @param <K> key type
+     * @param <V> value type
+     * @return refined instance
+     * @throws RefinementException if defaultValue is also invalid
+     */
+    @org.jetbrains.annotations.NotNull
+    public static <K, V> NonEmptyNavigableMap<K, V> ofOrElse(
+        @org.jetbrains.annotations.Nullable NavigableMap<K, V> value,
+        @org.jetbrains.annotations.NotNull NavigableMap<K, V> defaultValue
+    ) {
+        Validation<Violation, NonEmptyNavigableMap<K, V>> result = of(value);
+        return result.isValid() ? result.get() : unsafeOf(defaultValue);
+    }
 }

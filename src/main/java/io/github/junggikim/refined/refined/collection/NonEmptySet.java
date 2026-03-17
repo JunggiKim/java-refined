@@ -64,4 +64,22 @@ public final class NonEmptySet<T> extends AbstractSet<T> {
     public boolean contains(Object value) {
         return elements.contains(value);
     }
+
+    /**
+     * Returns a validated instance, or falls back to {@code defaultValue} if invalid.
+     *
+     * @param value input to validate
+     * @param defaultValue fallback (must itself be valid)
+     * @param <T> element type
+     * @return refined instance
+     * @throws RefinementException if defaultValue is also invalid
+     */
+    @org.jetbrains.annotations.NotNull
+    public static <T> NonEmptySet<T> ofOrElse(
+        @org.jetbrains.annotations.Nullable Set<T> value,
+        @org.jetbrains.annotations.NotNull Set<T> defaultValue
+    ) {
+        Validation<Violation, NonEmptySet<T>> result = of(value);
+        return result.isValid() ? result.get() : unsafeOf(defaultValue);
+    }
 }
