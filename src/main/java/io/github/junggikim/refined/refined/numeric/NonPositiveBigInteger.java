@@ -24,4 +24,18 @@ public final class NonPositiveBigInteger extends AbstractRefined<BigInteger> imp
     public static NonPositiveBigInteger unsafeOf(BigInteger value) {
         return RefinedSupport.unsafeRefine(value, CONSTRAINT, NonPositiveBigInteger::new);
     }
+
+    /**
+     * Returns a validated instance, or falls back to {@code defaultValue} if invalid.
+     *
+     * @param value input to validate
+     * @param defaultValue fallback (must itself be valid)
+     * @return refined instance
+     * @throws io.github.junggikim.refined.core.RefinementException if defaultValue is also invalid
+     */
+    @org.jetbrains.annotations.NotNull
+    public static NonPositiveBigInteger ofOrElse(@org.jetbrains.annotations.Nullable BigInteger value, @org.jetbrains.annotations.NotNull BigInteger defaultValue) {
+        Validation<Violation, NonPositiveBigInteger> result = of(value);
+        return result.isValid() ? result.get() : unsafeOf(defaultValue);
+    }
 }

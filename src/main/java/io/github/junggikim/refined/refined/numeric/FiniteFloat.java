@@ -23,4 +23,18 @@ public final class FiniteFloat extends AbstractRefined<Float> implements Newtype
     public static FiniteFloat unsafeOf(Float value) {
         return RefinedSupport.unsafeRefine(value, CONSTRAINT, FiniteFloat::new);
     }
+
+    /**
+     * Returns a validated instance, or falls back to {@code defaultValue} if invalid.
+     *
+     * @param value input to validate
+     * @param defaultValue fallback (must itself be valid)
+     * @return refined instance
+     * @throws io.github.junggikim.refined.core.RefinementException if defaultValue is also invalid
+     */
+    @org.jetbrains.annotations.NotNull
+    public static FiniteFloat ofOrElse(@org.jetbrains.annotations.Nullable Float value, @org.jetbrains.annotations.NotNull Float defaultValue) {
+        Validation<Violation, FiniteFloat> result = of(value);
+        return result.isValid() ? result.get() : unsafeOf(defaultValue);
+    }
 }

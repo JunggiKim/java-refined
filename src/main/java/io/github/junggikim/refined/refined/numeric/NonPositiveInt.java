@@ -23,4 +23,18 @@ public final class NonPositiveInt extends AbstractRefined<Integer> implements Ne
     public static NonPositiveInt unsafeOf(Integer value) {
         return RefinedSupport.unsafeRefine(value, CONSTRAINT, NonPositiveInt::new);
     }
+
+    /**
+     * Returns a validated instance, or falls back to {@code defaultValue} if invalid.
+     *
+     * @param value input to validate
+     * @param defaultValue fallback (must itself be valid)
+     * @return refined instance
+     * @throws io.github.junggikim.refined.core.RefinementException if defaultValue is also invalid
+     */
+    @org.jetbrains.annotations.NotNull
+    public static NonPositiveInt ofOrElse(@org.jetbrains.annotations.Nullable Integer value, @org.jetbrains.annotations.NotNull Integer defaultValue) {
+        Validation<Violation, NonPositiveInt> result = of(value);
+        return result.isValid() ? result.get() : unsafeOf(defaultValue);
+    }
 }

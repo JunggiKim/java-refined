@@ -23,4 +23,18 @@ public final class NonPositiveShort extends AbstractRefined<Short> implements Ne
     public static NonPositiveShort unsafeOf(Short value) {
         return RefinedSupport.unsafeRefine(value, CONSTRAINT, NonPositiveShort::new);
     }
+
+    /**
+     * Returns a validated instance, or falls back to {@code defaultValue} if invalid.
+     *
+     * @param value input to validate
+     * @param defaultValue fallback (must itself be valid)
+     * @return refined instance
+     * @throws io.github.junggikim.refined.core.RefinementException if defaultValue is also invalid
+     */
+    @org.jetbrains.annotations.NotNull
+    public static NonPositiveShort ofOrElse(@org.jetbrains.annotations.Nullable Short value, @org.jetbrains.annotations.NotNull Short defaultValue) {
+        Validation<Violation, NonPositiveShort> result = of(value);
+        return result.isValid() ? result.get() : unsafeOf(defaultValue);
+    }
 }

@@ -23,4 +23,18 @@ public final class NaturalInt extends AbstractRefined<Integer> implements Newtyp
     public static NaturalInt unsafeOf(Integer value) {
         return RefinedSupport.unsafeRefine(value, CONSTRAINT, NaturalInt::new);
     }
+
+    /**
+     * Returns a validated instance, or falls back to {@code defaultValue} if invalid.
+     *
+     * @param value input to validate
+     * @param defaultValue fallback (must itself be valid)
+     * @return refined instance
+     * @throws io.github.junggikim.refined.core.RefinementException if defaultValue is also invalid
+     */
+    @org.jetbrains.annotations.NotNull
+    public static NaturalInt ofOrElse(@org.jetbrains.annotations.Nullable Integer value, @org.jetbrains.annotations.NotNull Integer defaultValue) {
+        Validation<Violation, NaturalInt> result = of(value);
+        return result.isValid() ? result.get() : unsafeOf(defaultValue);
+    }
 }

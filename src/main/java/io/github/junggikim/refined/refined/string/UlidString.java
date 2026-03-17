@@ -23,4 +23,18 @@ public final class UlidString extends AbstractRefined<String> implements Newtype
     public static UlidString unsafeOf(String value) {
         return RefinedSupport.unsafeRefine(value, CONSTRAINT, UlidString::new);
     }
+
+    /**
+     * Returns a validated instance, or falls back to {@code defaultValue} if invalid.
+     *
+     * @param value input to validate
+     * @param defaultValue fallback (must itself be valid)
+     * @return refined instance
+     * @throws io.github.junggikim.refined.core.RefinementException if defaultValue is also invalid
+     */
+    @org.jetbrains.annotations.NotNull
+    public static UlidString ofOrElse(@org.jetbrains.annotations.Nullable String value, @org.jetbrains.annotations.NotNull String defaultValue) {
+        Validation<Violation, UlidString> result = of(value);
+        return result.isValid() ? result.get() : unsafeOf(defaultValue);
+    }
 }

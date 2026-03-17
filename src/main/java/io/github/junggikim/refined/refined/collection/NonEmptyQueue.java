@@ -88,4 +88,22 @@ public final class NonEmptyQueue<T> extends AbstractList<T> implements Queue<T> 
     public T last() {
         return elements.get(elements.size() - 1);
     }
+
+    /**
+     * Returns a validated instance, or falls back to {@code defaultValue} if invalid.
+     *
+     * @param value input to validate
+     * @param defaultValue fallback (must itself be valid)
+     * @param <T> element type
+     * @return refined instance
+     * @throws RefinementException if defaultValue is also invalid
+     */
+    @org.jetbrains.annotations.NotNull
+    public static <T> NonEmptyQueue<T> ofOrElse(
+        @org.jetbrains.annotations.Nullable Queue<T> value,
+        @org.jetbrains.annotations.NotNull Queue<T> defaultValue
+    ) {
+        Validation<Violation, NonEmptyQueue<T>> result = of(value);
+        return result.isValid() ? result.get() : unsafeOf(defaultValue);
+    }
 }

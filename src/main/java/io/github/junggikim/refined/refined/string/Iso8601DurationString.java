@@ -23,4 +23,18 @@ public final class Iso8601DurationString extends AbstractRefined<String> impleme
     public static Iso8601DurationString unsafeOf(String value) {
         return RefinedSupport.unsafeRefine(value, CONSTRAINT, Iso8601DurationString::new);
     }
+
+    /**
+     * Returns a validated instance, or falls back to {@code defaultValue} if invalid.
+     *
+     * @param value input to validate
+     * @param defaultValue fallback (must itself be valid)
+     * @return refined instance
+     * @throws io.github.junggikim.refined.core.RefinementException if defaultValue is also invalid
+     */
+    @org.jetbrains.annotations.NotNull
+    public static Iso8601DurationString ofOrElse(@org.jetbrains.annotations.Nullable String value, @org.jetbrains.annotations.NotNull String defaultValue) {
+        Validation<Violation, Iso8601DurationString> result = of(value);
+        return result.isValid() ? result.get() : unsafeOf(defaultValue);
+    }
 }

@@ -1,9 +1,12 @@
 package io.github.junggikim.refined.validation;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Fail-fast validation result used by refined constructors and low-level constraints.
@@ -121,6 +124,105 @@ public interface Validation<E, A> {
      */
     @NotNull
     E getError();
+
+    /**
+     * Returns the value if valid, otherwise returns {@code other}.
+     *
+     * @param other fallback value
+     * @return validated value or {@code other}
+     */
+    @NotNull
+    default A getOrElse(@NotNull A other) {
+        Objects.requireNonNull(other, "other");
+        return isValid() ? get() : other;
+    }
+
+    /**
+     * Returns the value if valid, otherwise computes a fallback from the error.
+     *
+     * @param handler function that converts the error into a fallback value
+     * @return validated value or handler result
+     */
+    @NotNull
+    default A getOrElse(@NotNull Function<? super E, ? extends A> handler) {
+        Objects.requireNonNull(handler, "handler");
+        return isValid() ? get() : Objects.requireNonNull(handler.apply(getError()), "handler result");
+    }
+
+    /**
+     * Returns the value if valid, otherwise {@code null}.
+     *
+     * @return validated value or {@code null}
+     */
+    @Nullable
+    default A getOrNull() {
+        return isValid() ? get() : null;
+    }
+
+    /**
+     * Returns an {@link Optional} containing the value if valid, or empty.
+     *
+     * @return optional of the validated value
+     */
+    @NotNull
+    default Optional<A> toOptional() {
+        return isValid() ? Optional.of(get()) : Optional.<A>empty();
+    }
+
+    /**
+     * Executes the given action when this result is valid and returns {@code this} for chaining.
+     *
+     * @param action side-effect to run on the success value
+     * @return this validation
+     */
+    @NotNull
+    default Validation<E, A> onValid(@NotNull Consumer<? super A> action) {
+        Objects.requireNonNull(action, "action");
+        if (isValid()) {
+            action.accept(get());
+        }
+        return this;
+    }
+
+    /**
+     * Executes the given action when this result is invalid and returns {@code this} for chaining.
+     *
+     * @param action side-effect to run on the error
+     * @return this validation
+     */
+    @NotNull
+    default Validation<E, A> onInvalid(@NotNull Consumer<? super E> action) {
+        Objects.requireNonNull(action, "action");
+        if (isInvalid()) {
+            action.accept(getError());
+        }
+        return this;
+    }
+
+    /**
+     * Maps the error when invalid, passes through when valid.
+     *
+     * @param f error mapping function
+     * @param <E2> new error type
+     * @return mapped validation
+     */
+    @NotNull
+    default <E2> Validation<E2, A> mapError(@NotNull Function<? super E, ? extends E2> f) {
+        Objects.requireNonNull(f, "f");
+        return isValid() ? valid(get()) : invalid(f.apply(getError()));
+    }
+
+    /**
+     * Recovers from an error by converting it to a success value.
+     *
+     * @param f recovery function
+     * @return this if valid, otherwise a valid result from {@code f}
+     */
+    @NotNull
+    default Validation<E, A> recover(@NotNull Function<? super E, ? extends A> f) {
+        Objects.requireNonNull(f, "f");
+        return isValid() ? this : valid(f.apply(getError()));
+    }
 
     final class Valid<E, A> implements Validation<E, A> {
         private final A value;
