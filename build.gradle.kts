@@ -16,7 +16,7 @@ plugins {
     pmd
     id("com.github.spotbugs") version "6.4.8"
     id("info.solidsoft.pitest") version "1.15.0"
-    kotlin("jvm") version "1.9.25" apply false
+    kotlin("jvm") version "2.3.20" apply false
 }
 
 val groupId = property("group") as String
